@@ -42,7 +42,7 @@ onMounted(load)
     <div class="dash-header">
       <div>
         <h1 class="dash-title">Dashboard</h1>
-        <p class="dash-subtitle">{{ data?.range.label ?? 'Business analytics overview' }}</p>
+        <p class="dash-subtitle">{{ data?.range?.label ?? 'Business analytics overview' }}</p>
       </div>
       <div class="dash-controls">
         <v-btn-toggle v-model="range" mandatory density="compact" color="primary" divided>
