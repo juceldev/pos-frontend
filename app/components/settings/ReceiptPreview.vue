@@ -36,10 +36,15 @@ const total = computed(() => props.sale?.total ?? 350)
 const paidAmount = computed(() => props.sale?.paid_amount ?? 400)
 const change = computed(() => props.sale?.change ?? 50)
 const paymentType = computed(() => props.sale?.payment_type?.name ?? 'Cash')
+
+const isBond = computed(() => {
+  const size = (props.printer?.sales_paper_size ?? '').toLowerCase()
+  return size.includes('bond') || size.includes('5.5') || size.includes('8.5 x 11') || size.includes('8.5 x 13')
+})
 </script>
 
 <template>
-  <div class="receipt-thermal">
+    :class="['receipt-thermal', { 'receipt-thermal--bond': isBond }]"
     <!-- Paper edge effect -->
     <div class="receipt-thermal__edge" />
 
@@ -309,5 +314,45 @@ const paymentType = computed(() => props.sale?.payment_type?.name ?? 'Cash')
   font-size: 10px;
   letter-spacing: 2px;
   margin-top: 2px;
+}
+
+.receipt-thermal--bond {
+  width: 5.5in;
+  min-height: 8.5in;
+  padding: 0.5in;
+  border: 1px solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.receipt-thermal--bond .receipt-thermal__body {
+  width: 100%;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.receipt-thermal--bond .receipt-company__name {
+  font-size: 16px;
+}
+
+.receipt-thermal--bond .receipt-title {
+  font-size: 14px;
+}
+
+.receipt-thermal--bond .receipt-item__row,
+.receipt-thermal--bond .receipt-totals__row {
+  font-size: 12px;
+}
+
+.receipt-thermal--bond .receipt-footer__remark {
+  font-size: 14px;
+}
+
+.receipt-thermal--bond .receipt-barcode {
+  margin-bottom: 0.25in;
 }
 </style>

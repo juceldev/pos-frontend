@@ -45,6 +45,12 @@ const paperSizes = [
               <v-combobox v-model="form[field.key]" :items="titleOptions" :disabled="!canEdit" variant="outlined" density="compact" hide-details />
             </v-col>
           </v-row>
+          <v-row dense class="title-row mt-2">
+            <v-col cols="12" sm="5" class="title-label text-caption text-medium-emphasis">Paper Size</v-col>
+            <v-col cols="12" sm="7">
+              <v-select v-model="form.sales_paper_size" :items="paperSizes" item-title="title" item-value="value" :disabled="!canEdit" variant="outlined" density="compact" hide-details />
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
 

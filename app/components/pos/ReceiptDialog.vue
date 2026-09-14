@@ -22,6 +22,13 @@ const dialog = computed({
 
 const { company, printer, fetchSettings } = useSettings()
 
+const isBond = computed(() => {
+  const size = (printer.value?.sales_paper_size ?? '').toLowerCase()
+  return size.includes('bond') || size.includes('5.5') || size.includes('8.5 x 11') || size.includes('8.5 x 13')
+})
+
+const dialogMaxWidth = computed(() => isBond.value ? '900' : '400')
+
 onMounted(fetchSettings)
 
 function print () {
@@ -39,7 +46,7 @@ function newSale () {
     id="receipt-print"
     title="Sale Receipt"
     icon="mdi-receipt-text"
-    max-width="400"
+    :max-width="dialogMaxWidth"
     scrollable
   >
     <v-card-text class="d-flex justify-center pa-4">

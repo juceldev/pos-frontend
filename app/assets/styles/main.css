@@ -256,10 +256,21 @@ html {
     position: absolute;
     left: 0;
     top: 0;
-    width: 80mm;
+    width: auto !important;
     max-width: 100%;
     box-shadow: none !important;
     border: none !important;
+  }
+
+  #receipt-print .receipt-thermal {
+    width: 80mm;
+    box-shadow: none !important;
+  }
+
+  #receipt-print .receipt-thermal--bond {
+    width: 5.5in;
+    min-height: 8.5in;
+    box-shadow: none !important;
   }
 
   #receipt-print .v-card-title,
