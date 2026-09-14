@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { AnalyticsData } from '~/types/report'
+import { useExpenses } from '~/composables/useExpenses'
 import { useReports } from '~/composables/useReports'
+import { formatAmount } from '~/utils/format'
+
+const { fetchMonthlyTotal, monthlyTotal } = useExpenses()
 
 definePageMeta({
   middleware: 'auth'
@@ -33,7 +37,10 @@ watch(range, () => {
   if (range.value !== 'custom') load()
 })
 
-onMounted(load)
+onMounted(async () => {
+  await fetchMonthlyTotal()
+  await load()
+})
 </script>
 
 <template>
@@ -66,6 +73,22 @@ onMounted(load)
     <template v-else-if="data">
       <!-- Stat cards -->
       <DashboardStatCards :summary="data.summary" />
+
+      <!-- Monthly Expenses -->
+      <v-card class="mb-3" v-if="monthlyTotal">
+        <v-card-text>
+          <div class="d-flex justify-space-between align-center">
+            <div>
+              <div class="text-caption text-medium-emphasis">This Month Expenses</div>
+              <div class="text-h6 font-weight-bold">{{ formatAmount(monthlyTotal?.total ?? 0) }}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-caption text-medium-emphasis">Running Total</div>
+              <div class="text-h6 font-weight-bold">{{ formatAmount(monthlyTotal?.running_total ?? 0) }}</div>
+            </div>
+          </div>
+        </v-card-text>
+      </v-card>
 
       <!-- Sales trend + Category sales -->
       <div class="dash-grid-2-1">
