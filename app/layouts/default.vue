@@ -220,7 +220,7 @@
     </v-main>
 
     <v-footer v-if="auth.ready && auth.isLoggedIn && !hideAppChrome" class="justify-center bg-surface">
-      <span class="text-caption text-medium-emphasis">&copy; {{ new Date().getFullYear() }} JmeTech POS</span>
+     <span  class="text-caption text-medium-emphasis" v-if="company?.company_name" >&copy; {{ new Date().getFullYear() }} {{ company.company_name }}</span>
     </v-footer>
 
     <AppNotification />
