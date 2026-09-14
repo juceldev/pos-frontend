@@ -90,6 +90,9 @@
     display: none !important;
   }
 }
+
+/* Mobile: stack dialog form columns */
+@media (max-width: 599px) {
   .v-dialog [class*="v-col-"]:not(.v-col-auto) {
     flex: 0 0 100% !important;
     max-width: 100% !important;
