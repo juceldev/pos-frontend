@@ -15,7 +15,12 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'https://gratified-amount-rural.ngrok-free.dev'
+      apiBaseUrl: ''
+    }
+  },
+  routeRules: {
+    '/api/**': {
+      proxy: process.env.NUXT_API_PROXY_URL || 'https://gratified-amount-rural.ngrok-free.dev/api/**'
     }
   },
   css: [
