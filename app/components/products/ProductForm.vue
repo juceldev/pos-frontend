@@ -197,6 +197,10 @@ watch(() => props.modelValue, async (open) => {
   }
 })
 
+let updatingFromRegularPrice = false
+let updatingFromWholesalePrice = false
+let updatingFromPromoPrice = false
+
 function calculatePrices () {
   const cost = Number(form.cost_price) || 0
   const regular = Number(form.regular_price) || 0
@@ -222,12 +226,15 @@ watch(() => [form.regular_price, form.cost_price], () => {
   const cost = Number(form.cost_price) || 0
   const price = Number(form.regular_price) || 0
   if (cost > 0 && price > 0) {
+    updatingFromRegularPrice = true
     form.markup_percent = Number((((price - cost) / cost) * 100).toFixed(2))
     form.markup_amount = Number((price - cost).toFixed(2))
+    nextTick(() => { updatingFromRegularPrice = false })
   }
 }, { deep: true })
 
 watch(() => [form.markup_percent, form.cost_price], () => {
+  if (updatingFromRegularPrice) return
   const cost = Number(form.cost_price) || 0
   const markupPercent = Number(form.markup_percent) || 0
   if (cost > 0 && markupPercent > 0) {
@@ -240,12 +247,15 @@ watch(() => [form.wholesale_price, form.cost_price], () => {
   const cost = Number(form.cost_price) || 0
   const price = Number(form.wholesale_price) || 0
   if (cost > 0 && price > 0) {
+    updatingFromWholesalePrice = true
     form.wholesale_markup_percent = Number((((price - cost) / cost) * 100).toFixed(2))
     form.wholesale_markup_amount = Number((price - cost).toFixed(2))
+    nextTick(() => { updatingFromWholesalePrice = false })
   }
 }, { deep: true })
 
 watch(() => [form.wholesale_markup_percent, form.cost_price], () => {
+  if (updatingFromWholesalePrice) return
   const cost = Number(form.cost_price) || 0
   const markupPercent = Number(form.wholesale_markup_percent) || 0
   if (cost > 0 && markupPercent > 0) {
@@ -258,11 +268,14 @@ watch(() => [form.promo_price, form.cost_price], () => {
   const cost = Number(form.cost_price) || 0
   const price = Number(form.promo_price) || 0
   if (cost > 0 && price > 0) {
+    updatingFromPromoPrice = true
     form.promo_markup_percent = Number((((price - cost) / cost) * 100).toFixed(2))
+    nextTick(() => { updatingFromPromoPrice = false })
   }
 }, { deep: true })
 
 watch(() => [form.promo_markup_percent, form.cost_price], () => {
+  if (updatingFromPromoPrice) return
   const cost = Number(form.cost_price) || 0
   const markupPercent = Number(form.promo_markup_percent) || 0
   if (cost > 0 && markupPercent > 0) {
