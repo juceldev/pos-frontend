@@ -30,14 +30,14 @@
         <v-app-bar-nav-icon class="d-md-none" @click="mobileDrawer = !mobileDrawer" />
       </template>
 
-      <v-app-bar-title class="d-flex align-center text-primary font-weight-bold" style="min-width: 0;">
+      <v-app-bar-title class="d-flex align-center text-primary font-weight-bold min-w-0" style="flex: 1 1 auto; min-width: 0;">
         <span v-if="company?.company_name" class="text-truncate me-2" style="min-width: 0; max-width: 100%;">{{ company.company_name }}</span>
         <v-chip color="primary" variant="outlined" size="x-small" class="ml-2 d-none d-sm-inline-flex">
           v1.0.0
         </v-chip>
       </v-app-bar-title>
 
-      <v-spacer />
+      <v-spacer class="d-none d-md-flex" />
 
       <div class="d-none d-md-flex align-center gap-2">
         <v-btn icon="mdi-home" to="/" color="primary" aria-label="Home" />
