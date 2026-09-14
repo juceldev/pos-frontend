@@ -1,0 +1,7 @@
+.products-page .v-data-table__td {
+  white-space: nowrap;
+}
+
+.products-page .v-data-table-server__footer {
+  padding: 8px 16px;
+}

@@ -1,0 +1,278 @@
+/* Global POS minimal overrides and utilities */
+
+.v-container {
+  width: 100%;
+  padding: 0px 10px 10px 10px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+html {
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Page shell */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+}
+
+/* Card utilities */
+.app-card {
+  padding: 1rem;
+}
+
+.stat-card {
+  border-left-width: 4px;
+  border-left-style: solid;
+}
+
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  color: rgb(var(--v-theme-on-surface-variant));
+  margin-bottom: 12px;
+}
+
+/* Action buttons visibility in tables */
+.action-btn {
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.v-data-table__tr:hover .action-btn {
+  opacity: 1;
+}
+
+/* Table header background */
+.v-data-table-header th {
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+  color: rgb(var(--v-theme-primary)) !important;
+  font-weight: 600;
+}
+
+/* Solid floating labels on outlined fields */
+.v-field--variant-outlined .v-label.v-field-label--floating {
+  background-color: rgb(var(--v-theme-surface));
+  color: rgba(var(--v-theme-on-surface), 0.9);
+  font-weight: 500;
+  padding: 0 4px;
+  opacity: 1;
+}
+
+/* Zebra striping for table rows */
+.v-data-table tbody tr:nth-of-type(odd) {
+  background-color: rgba(var(--v-theme-primary), 0.03);
+}
+
+.v-data-table tbody tr:nth-of-type(even) {
+  background-color: rgba(var(--v-theme-primary), 0.07);
+}
+
+/* Denser table rows */
+.v-data-table tbody tr {
+  height: 36px;
+}
+
+.v-data-table td,
+.v-data-table th {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+/* Sticky columns on the product table: barcode + name only */
+.app-table.product-table th:nth-child(3),
+.app-table.product-table td:nth-child(3),
+.app-table.product-table th:nth-child(4),
+.app-table.product-table td:nth-child(4) {
+  position: sticky;
+  background-color: rgb(var(--v-theme-surface));
+}
+
+.app-table.product-table td:nth-child(3),
+.app-table.product-table td:nth-child(4) {
+  z-index: 1;
+}
+
+.app-table.product-table thead th:nth-child(3),
+.app-table.product-table thead th:nth-child(4) {
+  z-index: 4;
+}
+
+.app-table.product-table :is(th, td):nth-child(3) {
+  left: 0;
+  width: 140px;
+  min-width: 140px;
+  max-width: 140px;
+}
+
+.app-table.product-table :is(th, td):nth-child(4) {
+  left: 140px;
+  min-width: 220px;
+  border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+
+.app-table.product-table.is-scrolled-x :is(th, td):nth-child(4) {
+  box-shadow: 4px 0 4px -2px rgba(0, 0, 0, 0.12);
+}
+
+/* Keep zebra striping opaque on sticky cells */
+.app-table.product-table tbody tr:nth-of-type(odd) td:nth-child(3),
+.app-table.product-table tbody tr:nth-of-type(odd) td:nth-child(4) {
+  background-color: rgb(var(--v-theme-surface));
+}
+
+.app-table.product-table tbody tr:nth-of-type(even) td:nth-child(3),
+.app-table.product-table tbody tr:nth-of-type(even) td:nth-child(4) {
+  background-color: color-mix(in srgb, rgb(var(--v-theme-surface)) 93%, rgb(var(--v-theme-primary)));
+}
+
+/* Stock-in summary table: full-width columns, nowrap content */
+.stock-in-table .v-table__wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.stock-in-table th,
+.stock-in-table td {
+  white-space: nowrap;
+}
+
+/* Gap utilities for flex rows */
+.gap-2 {
+  gap: 8px;
+}
+
+.gap-4 {
+  gap: 16px;
+}
+
+/* Pricing boxes use theme-aware accent borders/backgrounds */
+.pricing-box {
+  border-radius: 4px;
+  overflow: hidden;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.pricing-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+}
+
+.pricing-body {
+  padding: 8px;
+}
+
+.pricing-costing {
+  border-color: rgb(var(--v-theme-error));
+  background-color: rgba(var(--v-theme-error), 0.05);
+}
+
+.pricing-costing-header {
+  background-color: rgba(var(--v-theme-error), 0.1);
+  color: rgb(var(--v-theme-error));
+}
+
+.pricing-retail {
+  border-color: rgb(var(--v-theme-info));
+  background-color: rgba(var(--v-theme-info), 0.05);
+}
+
+.pricing-retail-header {
+  background-color: rgba(var(--v-theme-info), 0.1);
+  color: rgb(var(--v-theme-info));
+}
+
+.pricing-wholesale {
+  border-color: rgb(var(--v-theme-warning));
+  background-color: rgba(var(--v-theme-warning), 0.05);
+}
+
+.pricing-wholesale-header {
+  background-color: rgba(var(--v-theme-warning), 0.1);
+  color: rgb(var(--v-theme-warning));
+}
+
+.pricing-promo {
+  border-color: rgb(var(--v-theme-success));
+  background-color: rgba(var(--v-theme-success), 0.05);
+}
+
+.pricing-promo-header {
+  background-color: rgba(var(--v-theme-success), 0.1);
+  color: rgb(var(--v-theme-success));
+}
+
+/* Duplicate checker table */
+.duplicate-table {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.duplicate-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.duplicate-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: rgb(var(--v-theme-surface));
+}
+
+/* Receipt print styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #receipt-print,
+  #receipt-print * {
+    visibility: visible;
+  }
+
+  #receipt-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    max-width: 100%;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  #receipt-print .v-card-title,
+  #receipt-print .v-card-text {
+    padding: 4px 8px !important;
+  }
+
+  #receipt-print .v-card-actions,
+  #receipt-print .receipt-actions {
+    display: none !important;
+  }
+
+  #receipt-print .v-divider {
+    margin: 4px 0 !important;
+  }
+}
