@@ -44,7 +44,7 @@ const isBond = computed(() => {
 </script>
 
 <template>
-    :class="['receipt-thermal', { 'receipt-thermal--bond': isBond }]"
+  <div :class="['receipt-thermal', { 'receipt-thermal--bond': isBond }]">
     <!-- Paper edge effect -->
     <div class="receipt-thermal__edge" />
 
