@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await $fetch<{ token: string; user: User }>(`${config.public.apiBaseUrl}/api/login`, {
+      const response = await $fetch<{ token: string; user: User }>(`${config.public.apiBasePath}/api/login`, {
         method: 'POST',
         credentials: 'include',
         body: { username, password }
@@ -78,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout () {
     if (!token.value) return
     try {
-      await $fetch(`${config.public.apiBaseUrl}/api/logout`, {
+      await $fetch(`${config.public.apiBasePath}/api/logout`, {
         method: 'POST',
         credentials: 'include',
         headers: { Authorization: `Bearer ${token.value}` }

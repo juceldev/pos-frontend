@@ -5,7 +5,7 @@ export default defineNuxtPlugin(() => {
   const auth = useAuthStore()
 
   const api = $fetch.create({
-    baseURL: config.public.apiBaseUrl as string,
+    baseURL: config.public.apiBasePath as string,
     credentials: 'include',
     headers: {
       Accept: 'application/json'
