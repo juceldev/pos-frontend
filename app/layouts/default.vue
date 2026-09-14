@@ -30,51 +30,53 @@
         <v-app-bar-nav-icon class="d-md-none" @click="mobileDrawer = !mobileDrawer" />
       </template>
 
-      <v-app-bar-title class="d-flex align-center text-primary font-weight-bold">
-         <span v-if="company?.company_name" class="text-truncate me-2">{{ company.company_name }}</span>
-        <v-chip color="primary" variant="outlined" size="x-small" class="ml-2">
+      <v-app-bar-title class="d-flex align-center text-primary font-weight-bold" style="min-width: 0;">
+        <span v-if="company?.company_name" class="text-truncate me-2" style="max-width: 180px;">{{ company.company_name }}</span>
+        <v-chip color="primary" variant="outlined" size="x-small" class="ml-2 d-none d-sm-inline-flex">
           v1.0.0
         </v-chip>
       </v-app-bar-title>
 
       <v-spacer />
 
-      <v-btn icon="mdi-home" to="/" color="primary" aria-label="Home" />
-      <v-btn icon="mdi-cog" color="primary" aria-label="Settings" @click="settingsDialog = true" />
+      <div class="d-none d-md-flex align-center gap-2">
+        <v-btn icon="mdi-home" to="/" color="primary" aria-label="Home" />
+        <v-btn icon="mdi-cog" color="primary" aria-label="Settings" @click="settingsDialog = true" />
 
-      <v-btn
-        :icon="isDark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        color="primary"
-        aria-label="Toggle theme"
-        @click="toggle"
-      />
+        <v-btn
+          :icon="isDark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+          color="primary"
+          aria-label="Toggle theme"
+          @click="toggle"
+        />
 
-      <v-menu location="bottom end" offset-y>
-        <template #activator="{ props }">
-          <v-btn
-            v-bind="props"
-            variant="text"
-            color="primary"
-            append-icon="mdi-chevron-down"
-          >
-            <v-avatar size="28" color="primary" class="mr-2">
-              <span class="text-caption text-on-primary">{{ auth.user?.name?.[0] ?? 'U' }}</span>
-            </v-avatar>
-            <span class="d-none d-sm-inline">{{ auth.user?.name }}</span>
-          </v-btn>
-        </template>
-        <v-card min-width="220" class="app-card">
-          <v-list density="compact" nav>
-            <v-list-item
-              :title="auth.user?.name"
-              :subtitle="auth.user?.role"
-              prepend-icon="mdi-account"
-            />
-            <v-divider class="my-2" />
-            <v-list-item prepend-icon="mdi-logout" title="Logout" @click="handleLogout" />
-          </v-list>
-        </v-card>
-      </v-menu>
+        <v-menu location="bottom end" offset-y>
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              variant="text"
+              color="primary"
+              append-icon="mdi-chevron-down"
+            >
+              <v-avatar size="28" color="primary" class="mr-2">
+                <span class="text-caption text-on-primary">{{ auth.user?.name?.[0] ?? 'U' }}</span>
+              </v-avatar>
+              <span class="d-none d-sm-inline">{{ auth.user?.name }}</span>
+            </v-btn>
+          </template>
+          <v-card min-width="220" class="app-card">
+            <v-list density="compact" nav>
+              <v-list-item
+                :title="auth.user?.name"
+                :subtitle="auth.user?.role"
+                prepend-icon="mdi-account"
+              />
+              <v-divider class="my-2" />
+              <v-list-item prepend-icon="mdi-logout" title="Logout" @click="handleLogout" />
+            </v-list>
+          </v-card>
+        </v-menu>
+      </div>
     </v-app-bar>
 
     <!-- Horizontal nav bar (desktop only) -->
@@ -83,7 +85,7 @@
       flat
       color="primary"
       density="compact"
-      class="top-nav-bar"
+      class="top-nav-bar d-none d-md-flex"
     >
       <div class="d-flex align-center h-100 w-100 px-2">
         <template v-for="(entry, i) in filteredNav" :key="i">
@@ -197,6 +199,21 @@
       <v-spacer />
       <v-divider />
       <v-list nav density="compact" class="pa-2">
+        <v-list-item
+          v-if="auth.user"
+          :title="auth.user?.name"
+          :subtitle="auth.user?.role"
+          prepend-icon="mdi-account"
+          color="primary"
+          class="mb-1"
+        />
+        <v-list-item
+          :prepend-icon="isDark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+          :title="isDark ? 'Light mode' : 'Dark mode'"
+          color="primary"
+          class="mb-1"
+          @click="toggle"
+        />
         <v-list-item prepend-icon="mdi-cog" title="Settings" color="primary" class="mb-1" @click="settingsDialog = true" />
         <v-list-item prepend-icon="mdi-logout" title="Logout" color="error" @click="handleLogout" />
       </v-list>

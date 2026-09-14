@@ -72,8 +72,20 @@
   padding-inline-start: 24px;
 }
 
-/* Mobile: stack dialog form columns */
-@media (max-width: 599px) {
+/* Mobile: collapse filter inputs, keep only search */
+@media (max-width: 959px) {
+  .app-card > .v-toolbar .v-text-field:not(:first-child),
+  .app-card > .v-toolbar .v-select,
+  .app-card > .v-toolbar .v-autocomplete {
+    display: none !important;
+  }
+
+  .app-card > .v-toolbar .v-text-field:first-child {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0;
+  }
+}
   .v-dialog [class*="v-col-"]:not(.v-col-auto) {
     flex: 0 0 100% !important;
     max-width: 100% !important;
