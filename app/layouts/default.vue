@@ -5,17 +5,17 @@
       class="pos-system-bar px-2 px-md-4"
       height="32"
     >
-      <span v-if="company?.company_name" class="text-truncate me-2">{{ company.company_name }}</span>
-      <span v-if="company?.company_name && company?.branch_name" class="me-2">({{ company.branch_name }})</span>
-      <span v-if="company?.company_name" class="me-2">|</span>
-      <span v-if="company?.pc_name" class="me-2">{{ company.pc_name }}</span>
-      <span v-if="company?.pc_name" class="me-2">|</span>
-      <span v-if="company?.terminal_id" class="me-2">{{ company.terminal_id }}</span>
+      <span v-if="company?.company_name" class="text-truncate me-2" style="max-width: 160px;">{{ company.company_name }}</span>
+      <span v-if="company?.company_name && company?.branch_name" class="me-2 d-none d-sm-inline">({{ company.branch_name }})</span>
+      <span v-if="company?.company_name" class="me-2 d-none d-sm-inline">|</span>
+      <span v-if="company?.pc_name" class="me-2 d-none d-sm-inline">{{ company.pc_name }}</span>
+      <span v-if="company?.pc_name" class="me-2 d-none d-sm-inline">|</span>
+      <span v-if="company?.terminal_id" class="me-2 d-none d-sm-inline">{{ company.terminal_id }}</span>
 
       <v-spacer />
 
-      <span class="text-truncate me-2">{{ auth.user?.name }}</span>
-      <span class="me-2">|</span>
+      <span class="text-truncate me-2 d-none d-sm-inline">{{ auth.user?.name }}</span>
+      <span class="me-2 d-none d-sm-inline">|</span>
       <span>{{ dateString }}</span>
     </v-system-bar>
 

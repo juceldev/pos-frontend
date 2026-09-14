@@ -123,7 +123,7 @@ const displayHeaders = computed(() => props.headers.filter(h => h.key !== 'actio
             </span>
           </div>
         </v-card-text>
-        <v-card-actions v-if="$slots['item.actions']" class="justify-end pt-0 pb-2">
+        <v-card-actions v-if="$slots['item.actions']" class="justify-end flex-wrap pt-0 pb-2">
           <slot name="item.actions" :item="item" />
         </v-card-actions>
       </slot>

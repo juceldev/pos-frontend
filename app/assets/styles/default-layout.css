@@ -85,6 +85,10 @@
     max-width: 100% !important;
     min-width: 0;
   }
+
+  .app-card > .v-toolbar .v-spacer {
+    display: none !important;
+  }
 }
   .v-dialog [class*="v-col-"]:not(.v-col-auto) {
     flex: 0 0 100% !important;
