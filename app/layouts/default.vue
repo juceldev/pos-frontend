@@ -2,7 +2,7 @@
   <v-app>
     <v-system-bar
       color="primary"
-      class="pos-system-bar px-2 px-md-4 d-none d-sm-flex"
+      class="pos-system-bar px-2 px-md-4 d-none d-md-flex"
       height="32"
     >
       <span v-if="company?.company_name" class="text-truncate me-2" style="max-width: 160px;">{{ company.company_name }}</span>

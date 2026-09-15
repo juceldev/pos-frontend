@@ -219,6 +219,7 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
             color="primary"
             offset-x="8"
             offset-y="8"
+            class="d-lg-none"
           >
             <v-tooltip text="Filters" location="top">
               <template #activator="{ props: tipProps }">
@@ -234,19 +235,15 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
             </v-tooltip>
           </v-badge>
           <v-spacer />
-          <v-tooltip text="Refresh" location="top">
-            <template #activator="{ props: tipProps }">
-              <v-btn
-                v-bind="tipProps"
-                icon="mdi-refresh"
-                variant="text"
-                size="small"
-                aria-label="Refresh"
-                :loading="returnsLoading"
-                @click="loadReturns"
-              />
-            </template>
-          </v-tooltip>
+          <v-btn
+            prepend-icon="mdi-refresh"
+            variant="text"
+            size="small"
+            :loading="returnsLoading"
+            @click="loadReturns"
+          >
+            <span class="d-none d-sm-inline">Refresh</span>
+          </v-btn>
         </v-toolbar>
         <div v-if="returnActiveFilters.length" class="d-flex flex-wrap ga-1 px-4 pb-2">
           <v-chip
@@ -364,19 +361,15 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
             class="align-self-center me-3"
           />
           <v-spacer />
-          <v-tooltip text="Refresh" location="top">
-            <template #activator="{ props: tipProps }">
-              <v-btn
-                v-bind="tipProps"
-                icon="mdi-refresh"
-                variant="text"
-                size="small"
-                aria-label="Refresh"
-                :loading="voidsLoading"
-                @click="loadVoids"
-              />
-            </template>
-          </v-tooltip>
+          <v-btn
+            prepend-icon="mdi-refresh"
+            variant="text"
+            size="small"
+            :loading="voidsLoading"
+            @click="loadVoids"
+          >
+            <span class="d-none d-sm-inline">Refresh</span>
+          </v-btn>
         </v-toolbar>
         <v-divider />
         <AppDataTable
