@@ -26,7 +26,7 @@ function onCancel () {
         <v-btn class="flex-grow-1" color="error" variant="outlined" @click="onCancel">
           {{ state.cancelText }}
         </v-btn>
-        <v-btn class="flex-grow-1" color="primary" @click="onConfirm">
+        <v-btn class="flex-grow-1" color="primary" variant="elevated" @click="onConfirm">
           {{ state.confirmText }}
         </v-btn>
       </v-card-actions>
