@@ -478,26 +478,25 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
 
       <v-divider class="my-4" />
       <div class="text-subtitle-2 mb-2">Items to Return</div>
-      <v-list density="compact" class="pa-0" style="max-height: 280px; overflow-y: auto;">
-        <v-list-item
-          v-for="i in selectedReturn.items"
+      <div style="max-height: 280px; overflow-y: auto;">
+        <v-card
+          v-for="(i, index) in selectedReturn.items"
           :key="i.id"
-          class="px-0"
+          variant="outlined"
+          class="mb-2"
         >
-          <template #title>
-            <div class="d-flex justify-space-between align-center">
-              <span class="text-body-2 font-weight-medium">{{ i.product?.name ?? i.description ?? '-' }}</span>
+          <v-card-text class="pa-3">
+            <div class="d-flex justify-space-between align-center mb-1">
+              <span class="text-body-2 font-weight-medium">{{ index + 1 }}. {{ i.product?.name ?? i.description ?? '-' }}</span>
               <span class="text-body-2 font-weight-medium">{{ formatAmount(i.total) }}</span>
             </div>
-          </template>
-          <template #subtitle>
             <div class="text-caption text-medium-emphasis">
               {{ i.quantity }} × {{ formatAmount(i.unit_price) }}
               <span v-if="i.serials && i.serials.length"> · Serials: {{ i.serials.join(', ') }}</span>
             </div>
-          </template>
-        </v-list-item>
-      </v-list>
+          </v-card-text>
+        </v-card>
+      </div>
     </v-card-text>
     <v-card-actions class="pa-4 pt-0">
       <v-spacer />
