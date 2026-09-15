@@ -67,6 +67,28 @@ export function useExpenses () {
     }
   }
 
+  async function fetchExpenseTypes () {
+    try {
+      const response = await $api('/api/expense-types') as any
+      return response.data ?? []
+    } catch (err: any) {
+      return []
+    }
+  }
+
+  async function createExpenseType (name: string, description?: string) {
+    try {
+      const response = await $api('/api/expense-types', {
+        method: 'POST',
+        body: { name, description }
+      }) as any
+      return response?.data ?? null
+    } catch (err: any) {
+      error.value = err?.data?.message || 'Failed to create expense type'
+      return null
+    }
+  }
+
   return {
     expenses,
     meta,
@@ -77,6 +99,8 @@ export function useExpenses () {
     createExpense,
     updateExpense,
     deleteExpense,
-    fetchMonthlyTotal
+    fetchMonthlyTotal,
+    fetchExpenseTypes,
+    createExpenseType
   }
 }

@@ -8,7 +8,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { expenses, meta, loading, error, fetchExpenses, createExpense, updateExpense, deleteExpense } = useExpenses()
+const { expenses, meta, loading, error, fetchExpenses, createExpense, updateExpense, deleteExpense, fetchExpenseTypes, createExpenseType } = useExpenses()
 const { hasPermission } = usePermission()
 
 const search = ref('')
@@ -20,16 +20,40 @@ const perPage = ref(15)
 const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([{ key: 'expense_date', order: 'desc' }])
 const showFilterDrawer = ref(false)
 const showForm = ref(false)
+const showTypeForm = ref(false)
 const selectedExpense = ref<Expense | null>(null)
 
-const expenseTypes = [
+const expenseTypeNames = ref<string[]>([])
+const newTypeName = ref('')
+const newTypeDescription = ref('')
+const typeSaving = ref(false)
+
+const expenseTypes = computed(() => [
   { title: 'All', value: null },
-  { title: 'Rent', value: 'Rent' },
-  { title: 'Water', value: 'Water' },
-  { title: 'Internet', value: 'Internet' },
-  { title: 'Electric', value: 'Electric' },
-  { title: 'Other', value: 'Other' }
-]
+  ...expenseTypeNames.value.map(name => ({ title: name, value: name }))
+])
+
+async function loadExpenseTypes () {
+  const types = await fetchExpenseTypes()
+  expenseTypeNames.value = types.map((t: any) => t.name)
+}
+
+async function saveType () {
+  if (!newTypeName.value.trim()) return
+  typeSaving.value = true
+  const created = await createExpenseType(newTypeName.value.trim(), newTypeDescription.value.trim() || undefined)
+  typeSaving.value = false
+  if (created) {
+    await loadExpenseTypes()
+    form.type = created.name
+    newTypeName.value = ''
+    newTypeDescription.value = ''
+    showTypeForm.value = false
+    snackbarText.value = 'Expense type added'
+    snackbarColor.value = 'success'
+    snackbar.value = true
+  }
+}
 
 const headers = [
   { title: 'Date', key: 'expense_date', sortable: true },
@@ -148,7 +172,10 @@ watch(error, (msg) => {
   }
 })
 
-onMounted(load)
+onMounted(async () => {
+  await loadExpenseTypes()
+  await load()
+})
 watch(filters, load, { deep: true })
 </script>
 
@@ -354,12 +381,14 @@ watch(filters, load, { deep: true })
           <v-select
             v-model="form.type"
             label="Type"
-            :items="expenseTypes.filter(t => t.value)"
+            :items="expenseTypeNames.map(n => ({ title: n, value: n }))"
             item-title="title"
             item-value="value"
             density="compact"
             variant="outlined"
             hide-details
+            append-inner-icon="mdi-plus"
+            @click:append-inner="showTypeForm = true"
           />
         </v-col>
         <v-col cols="12">
@@ -384,6 +413,36 @@ watch(filters, load, { deep: true })
         </v-col>
       </v-row>
     </AppFormSection>
+  </AppFormDialog>
+
+  <AppFormDialog
+    v-model="showTypeForm"
+    title="Add Expense Type"
+    :max-width="400"
+    :can-save="!!newTypeName.trim()"
+    :loading="typeSaving"
+    @save="saveType"
+  >
+    <v-row dense>
+      <v-col cols="12">
+        <v-text-field
+          v-model="newTypeName"
+          label="Type Name"
+          density="compact"
+          variant="outlined"
+          hide-details
+        />
+      </v-col>
+      <v-col cols="12">
+        <v-text-field
+          v-model="newTypeDescription"
+          label="Description (optional)"
+          density="compact"
+          variant="outlined"
+          hide-details
+        />
+      </v-col>
+    </v-row>
   </AppFormDialog>
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000">
