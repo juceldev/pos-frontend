@@ -32,10 +32,20 @@
       </template>
 
       <v-app-bar-title class="d-flex align-center text-primary font-weight-bold min-w-0 text-body-1 text-sm-h6" style="flex: 1 1 auto; min-width: 0;">
-        <span v-if="company?.company_name" class="text-truncate me-2" style="min-width: 0; max-width: 100%;">{{ company.company_name }}</span>
-        <v-chip color="primary" variant="outlined" size="x-small" class="ml-2 d-none d-sm-inline-flex">
-          v1.0.0
-        </v-chip>
+        <v-img
+          v-if="company?.company_logo_url && smAndDown"
+          :src="company.company_logo_url"
+          max-height="40"
+          max-width="160"
+          contain
+          class="me-2"
+        />
+        <template v-else>
+          <span v-if="company?.company_name" class="text-truncate me-2" style="min-width: 0; max-width: 100%;">{{ company.company_name }}</span>
+          <v-chip color="primary" variant="outlined" size="x-small" class="ml-2 d-none d-sm-inline-flex">
+            v1.0.0
+          </v-chip>
+        </template>
       </v-app-bar-title>
 
       <v-spacer class="d-none d-md-flex" />
@@ -197,7 +207,6 @@
         </template>
       </v-list>
 
-      <v-spacer />
       <v-divider />
       <v-list nav density="compact" class="pa-2">
         <v-list-item
@@ -324,7 +333,7 @@ const navEntries: NavEntry[] = [
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
-const { mdAndUp } = useDisplay()
+const { mdAndUp, smAndDown } = useDisplay()
 const { isDark, toggle, init: initTheme } = useAppTheme()
 const { company, fetchSettings } = useSettings()
 const { hasPermission } = usePermission()
