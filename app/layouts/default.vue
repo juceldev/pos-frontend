@@ -33,7 +33,7 @@
 
       <v-app-bar-title class="d-flex align-center text-primary font-weight-bold min-w-0 text-body-1 text-sm-h6" style="flex: 1 1 auto; min-width: 0;">
         <v-img
-          v-if="company?.company_logo_url && smAndDown"
+          v-if="company?.company_logo_url && mdAndUp"
           :src="company.company_logo_url"
           max-height="40"
           max-width="160"
@@ -161,11 +161,19 @@
       class="mobile-nav-drawer"
     >
       <div class="d-flex align-center pa-4">
-        <v-avatar color="primary" class="mr-3">
+        <v-img
+          v-if="company?.company_logo_url"
+          :src="company.company_logo_url"
+          max-height="48"
+          max-width="120"
+          contain
+          class="mr-3"
+        />
+        <v-avatar v-else color="primary" class="mr-3">
           <v-icon color="white" size="24">mdi-office-building</v-icon>
         </v-avatar>
         <div>
-          <div class="text-subtitle-1 font-weight-bold">JmeTech</div>
+          <div class="text-subtitle-1 font-weight-bold">{{ company?.company_name ?? 'JmeTech' }}</div>
           <div class="text-caption text-medium-emphasis">POS SYSTEM</div>
         </div>
       </div>
