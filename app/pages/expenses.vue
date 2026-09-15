@@ -266,9 +266,6 @@ watch(filters, load, { deep: true })
         </v-tooltip>
       </v-badge>
       <v-spacer />
-      <div class="text-body-2 me-4 d-none d-sm-block">
-        <span class="font-weight-bold">Page total:</span> {{ formatAmount(pageTotal) }}
-      </div>
       <v-tooltip text="Refresh" location="top">
         <template #activator="{ props: tipProps }">
           <v-btn
