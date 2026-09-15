@@ -53,6 +53,12 @@
 }
 
 /* Mobile drawer */
+.mobile-nav-drawer .v-navigation-drawer__content {
+  overflow-y: auto !important;
+  display: flex;
+  flex-direction: column;
+}
+
 .mobile-nav-drawer .v-list {
   padding-top: 4px;
   padding-bottom: 4px;
