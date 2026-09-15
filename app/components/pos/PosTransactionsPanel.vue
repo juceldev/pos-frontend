@@ -236,32 +236,13 @@ onMounted(load)
         </template>
 
         <template #item.status="{ item }">
-          <div class="d-flex align-center ga-1 flex-wrap">
-            <v-chip
-              v-if="!(item.status === 'partially_returned' && hasApprovedReturn(item))"
-              size="x-small"
-              :color="statusColor(item.status ?? '')"
-              variant="tonal"
-            >
-              {{ item.status ?? '—' }}
-            </v-chip>
-            <v-chip
-              v-else
-              size="x-small"
-              color="info"
-              variant="tonal"
-            >
-              Return Approved
-            </v-chip>
-            <v-chip
-              v-if="hasPendingReturn(item)"
-              size="x-small"
-              color="warning"
-              variant="tonal"
-            >
-              Pending
-            </v-chip>
-          </div>
+          <v-chip
+            size="x-small"
+            :color="item.status === 'partially_returned' && hasApprovedReturn(item) ? 'info' : statusColor(item.status ?? '')"
+            variant="tonal"
+          >
+            {{ item.status === 'partially_returned' && hasApprovedReturn(item) ? 'Return Approved' : (item.status ?? '—') }}
+          </v-chip>
         </template>
 
         <template #item.created_at="{ item }">
@@ -270,35 +251,47 @@ onMounted(load)
 
         <template #item.actions="{ item }">
           <div class="d-flex justify-end ga-1">
-            <v-btn
-              icon="mdi-receipt-text"
-              :size="smAndDown ? 'default' : 'small'"
-              density="comfortable"
-              variant="tonal"
-              color="primary"
-              title="View"
-              @click.stop="viewSale(item)"
-            />
-            <v-btn
-              v-if="hasPermission('sales.edit') && canReturn(item)"
-              icon="mdi-undo-variant"
-              :size="smAndDown ? 'default' : 'small'"
-              density="comfortable"
-              variant="tonal"
-              color="warning"
-              title="Return"
-              @click.stop="openReturn(item)"
-            />
-            <v-btn
-              v-if="hasPermission('sales.delete') && item.status !== 'voided'"
-              icon="mdi-close-circle"
-              :size="smAndDown ? 'default' : 'small'"
-              density="comfortable"
-              variant="tonal"
-              color="error"
-              title="Void"
-              @click.stop="openVoid(item)"
-            />
+            <v-tooltip text="Receipt" location="top">
+              <template #activator="{ props: tipProps }">
+                <v-btn
+                  v-bind="tipProps"
+                  icon="mdi-receipt-text"
+                  :size="smAndDown ? 'default' : 'small'"
+                  density="comfortable"
+                  variant="tonal"
+                  color="primary"
+                  @click.stop="viewSale(item)"
+                />
+              </template>
+            </v-tooltip>
+            <v-tooltip text="Return" location="top">
+              <template #activator="{ props: tipProps }">
+                <v-btn
+                  v-bind="tipProps"
+                  v-if="hasPermission('sales.edit') && canReturn(item)"
+                  icon="mdi-undo-variant"
+                  :size="smAndDown ? 'default' : 'small'"
+                  density="comfortable"
+                  variant="tonal"
+                  color="warning"
+                  @click.stop="openReturn(item)"
+                />
+              </template>
+            </v-tooltip>
+            <v-tooltip text="Void" location="top">
+              <template #activator="{ props: tipProps }">
+                <v-btn
+                  v-bind="tipProps"
+                  v-if="hasPermission('sales.delete') && item.status !== 'voided'"
+                  icon="mdi-close-circle"
+                  :size="smAndDown ? 'default' : 'small'"
+                  density="comfortable"
+                  variant="tonal"
+                  color="error"
+                  @click.stop="openVoid(item)"
+                />
+              </template>
+            </v-tooltip>
           </div>
         </template>
       </AppDataTable>
