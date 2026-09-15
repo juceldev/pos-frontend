@@ -152,28 +152,13 @@
 
     <!-- Mobile drawer -->
     <v-navigation-drawer
-      v-if="auth.ready"
+      v-if="auth.ready && auth.isLoggedIn && !mdAndUp && !hideAppChrome && !isPosPage"
       v-model="mobileDrawer"
       temporary
       :width="260"
       color="background"
       class="mobile-nav-drawer"
     >
-      <div class="d-flex align-center pa-4">
-        <v-img
-          v-if="company?.company_logo_url"
-          :src="company.company_logo_url"
-          max-height="48"
-          max-width="120"
-          contain
-          class="mr-3"
-        />
-        <div>
-          <div class="text-subtitle-1 font-weight-bold">{{ company?.company_name ?? 'JmeTech' }}</div>
-          <div class="text-caption text-medium-emphasis">POS SYSTEM</div>
-        </div>
-      </div>
-      <v-divider />
 
       <v-list nav density="compact" class="pa-2">
         <template v-for="(entry, i) in filteredNav" :key="i">
