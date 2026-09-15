@@ -25,6 +25,7 @@
       v-if="auth.ready && auth.isLoggedIn && !hideAppChrome && !isPosPage"
       flat
       color="surface"
+      density="comfortable"
       class="app-bar border-b"
     >
       <template #prepend>
@@ -245,7 +246,7 @@
       <v-container
         v-else-if="auth.isLoggedIn"
         fluid
-        :class="['text-start', { 'pa-0 ma-0 fill-height': hideAppChrome || isPosPage }]"
+        :class="['text-start', 'pt-2', { 'pa-0 ma-0 fill-height': hideAppChrome || isPosPage }]"
         :style="(hideAppChrome || isPosPage) ? { height: '100%' } : {}"
       >
         <slot />
