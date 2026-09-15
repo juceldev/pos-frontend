@@ -454,74 +454,71 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
     scrollable
   >
     <v-card-text v-if="selectedReturn">
-      <v-row dense>
-        <v-col cols="12" sm="6" md="3">
-          <div class="text-caption text-medium-emphasis">Customer</div>
-          <div class="font-weight-medium">{{ selectedReturn.sale?.customer?.name ?? 'Walk-in' }}</div>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <div class="text-caption text-medium-emphasis">Requested By</div>
-          <div class="font-weight-medium">{{ selectedReturn.user?.name ?? '-' }}</div>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <div class="text-caption text-medium-emphasis">Date</div>
-          <div class="font-weight-medium">{{ new Date(selectedReturn.created_at ?? '').toLocaleString() }}</div>
-        </v-col>
-        <v-col cols="12" sm="6" md="3">
-          <div class="text-caption text-medium-emphasis">Total Refund</div>
-          <div class="font-weight-medium text-primary">{{ formatAmount(selectedReturn.returned_total) }}</div>
-        </v-col>
-      </v-row>
+      <div class="d-flex justify-space-between py-1">
+        <span class="text-caption text-medium-emphasis">Customer</span>
+        <span class="font-weight-medium">{{ selectedReturn.sale?.customer?.name ?? 'Walk-in' }}</span>
+      </div>
+      <div class="d-flex justify-space-between py-1">
+        <span class="text-caption text-medium-emphasis">Requested By</span>
+        <span class="font-weight-medium">{{ selectedReturn.user?.name ?? '-' }}</span>
+      </div>
+      <div class="d-flex justify-space-between py-1">
+        <span class="text-caption text-medium-emphasis">Date</span>
+        <span class="font-weight-medium">{{ new Date(selectedReturn.created_at ?? '').toLocaleString() }}</span>
+      </div>
+      <div class="d-flex justify-space-between py-1">
+        <span class="text-caption text-medium-emphasis">Total Refund</span>
+        <span class="font-weight-medium text-primary">{{ formatAmount(selectedReturn.returned_total) }}</span>
+      </div>
 
-      <div v-if="selectedReturn.notes" class="mt-4">
+      <div v-if="selectedReturn.notes" class="mt-2">
         <div class="text-caption text-medium-emphasis">Reason / Notes</div>
         <div class="text-body-2">{{ selectedReturn.notes }}</div>
       </div>
 
       <v-divider class="my-4" />
       <div class="text-subtitle-2 mb-2">Items to Return</div>
-      <v-table density="comfortable">
-        <thead>
-          <tr>
-            <th class="text-left">Product</th>
-            <th class="text-left">Serials</th>
-            <th class="text-right">Qty</th>
-            <th class="text-right">Unit Price</th>
-            <th class="text-right">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="i in selectedReturn.items" :key="i.id">
-            <td>{{ i.product?.name ?? i.description ?? '-' }}</td>
-            <td>
-              <span v-if="i.serials && i.serials.length">{{ i.serials.join(', ') }}</span>
-              <span v-else class="text-medium-emphasis text-caption">-</span>
-            </td>
-            <td class="text-right">{{ i.quantity }}</td>
-            <td class="text-right">{{ formatAmount(i.unit_price) }}</td>
-            <td class="text-right">{{ formatAmount(i.total) }}</td>
-          </tr>
-        </tbody>
-      </v-table>
+      <v-list density="compact" class="pa-0" style="max-height: 280px; overflow-y: auto;">
+        <v-list-item
+          v-for="i in selectedReturn.items"
+          :key="i.id"
+          class="px-0"
+        >
+          <template #title>
+            <div class="d-flex justify-space-between align-center">
+              <span class="text-body-2 font-weight-medium">{{ i.product?.name ?? i.description ?? '-' }}</span>
+              <span class="text-body-2 font-weight-medium">{{ formatAmount(i.total) }}</span>
+            </div>
+          </template>
+          <template #subtitle>
+            <div class="text-caption text-medium-emphasis">
+              {{ i.quantity }} × {{ formatAmount(i.unit_price) }}
+              <span v-if="i.serials && i.serials.length"> · Serials: {{ i.serials.join(', ') }}</span>
+            </div>
+          </template>
+        </v-list-item>
+      </v-list>
     </v-card-text>
-    <v-card-actions class="pa-4 pt-0" v-if="selectedReturn?.status === 'pending'">
+    <v-card-actions class="pa-4 pt-0">
       <v-spacer />
       <v-btn variant="text" @click="closePreview">Close</v-btn>
-      <v-btn
-        color="error"
-        variant="tonal"
-        :loading="isProcessing"
-        @click="previewReject"
-      >
-        Reject
-      </v-btn>
-      <v-btn
-        color="success"
-        :loading="isProcessing"
-        @click="previewApprove"
-      >
-        Approve
-      </v-btn>
+      <template v-if="selectedReturn?.status === 'pending'">
+        <v-btn
+          color="error"
+          variant="tonal"
+          :loading="isProcessing"
+          @click="previewReject"
+        >
+          Reject
+        </v-btn>
+        <v-btn
+          color="success"
+          :loading="isProcessing"
+          @click="previewApprove"
+        >
+          Approve
+        </v-btn>
+      </template>
     </v-card-actions>
   </AppDialog>
 </template>
