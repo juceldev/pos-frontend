@@ -149,10 +149,17 @@ async function saveExpense () {
   }
 }
 
+const { confirm } = useConfirm()
+
 async function handleDelete (expense: Expense) {
-  if (!confirm(`Delete expense ${expense.description}?`)) return
-  const ok = await deleteExpense(expense.id)
-  if (ok) {
+  const ok = await confirm({
+    title: 'Delete Expense',
+    message: `Delete expense "${expense.description}"?`,
+    confirmText: 'Delete'
+  })
+  if (!ok) return
+  const deleted = await deleteExpense(expense.id)
+  if (deleted) {
     await load()
     snackbarText.value = 'Expense deleted'
     snackbarColor.value = 'success'
