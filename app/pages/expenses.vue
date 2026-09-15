@@ -250,6 +250,7 @@ watch(filters, load, { deep: true })
         color="primary"
         offset-x="8"
         offset-y="8"
+        class="d-lg-none"
       >
         <v-tooltip text="Filters" location="top">
           <template #activator="{ props: tipProps }">
