@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-system-bar
+      v-if="mdAndUp"
       color="primary"
       class="pos-system-bar px-2 px-md-4 d-none d-md-flex"
       height="32"
