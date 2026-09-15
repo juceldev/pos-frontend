@@ -266,19 +266,15 @@ watch(filters, load, { deep: true })
         </v-tooltip>
       </v-badge>
       <v-spacer />
-      <v-tooltip text="Refresh" location="top">
-        <template #activator="{ props: tipProps }">
-          <v-btn
-            v-bind="tipProps"
-            icon="mdi-refresh"
-            variant="text"
-            size="small"
-            aria-label="Refresh"
-            :loading="loading"
-            @click="load"
-          />
-        </template>
-      </v-tooltip>
+      <v-btn
+        prepend-icon="mdi-refresh"
+        variant="text"
+        size="small"
+        :loading="loading"
+        @click="load"
+      >
+        <span class="d-none d-sm-inline">Refresh</span>
+      </v-btn>
     </v-toolbar>
     <div v-if="activeFilters.length" class="d-flex flex-wrap ga-1 px-4 pb-2">
       <v-chip
