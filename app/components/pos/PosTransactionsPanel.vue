@@ -251,39 +251,41 @@ onMounted(load)
 
         <template #item.actions="{ item }">
           <div class="d-flex justify-end ga-2 align-center">
-            <div class="d-flex align-center">
-              <v-btn
-                icon="mdi-receipt-text"
-                :size="smAndDown ? 'default' : 'small'"
-                density="comfortable"
-                variant="tonal"
-                color="primary"
-                @click.stop="viewSale(item)"
-              />
-              <span class="d-none d-sm-inline text-caption ml-1">Receipt</span>
-            </div>
-            <div v-if="hasPermission('sales.edit') && canReturn(item)" class="d-flex align-center">
-              <v-btn
-                icon="mdi-undo-variant"
-                :size="smAndDown ? 'default' : 'small'"
-                density="comfortable"
-                variant="tonal"
-                color="warning"
-                @click.stop="openReturn(item)"
-              />
-              <span class="d-none d-sm-inline text-caption ml-1">Return</span>
-            </div>
-            <div v-if="hasPermission('sales.delete') && item.status !== 'voided'" class="d-flex align-center">
-              <v-btn
-                icon="mdi-close-circle"
-                :size="smAndDown ? 'default' : 'small'"
-                density="comfortable"
-                variant="tonal"
-                color="error"
-                @click.stop="openVoid(item)"
-              />
-              <span class="d-none d-sm-inline text-caption ml-1">Void</span>
-            </div>
+            <v-btn
+              :icon="smAndDown ? 'mdi-receipt-text' : undefined"
+              :prepend-icon="smAndDown ? undefined : 'mdi-receipt-text'"
+              :size="smAndDown ? 'default' : 'small'"
+              density="comfortable"
+              variant="tonal"
+              color="primary"
+              @click.stop="viewSale(item)"
+            >
+              <span v-if="!smAndDown" class="ml-1">Receipt</span>
+            </v-btn>
+            <v-btn
+              v-if="hasPermission('sales.edit') && canReturn(item)"
+              :icon="smAndDown ? 'mdi-undo-variant' : undefined"
+              :prepend-icon="smAndDown ? undefined : 'mdi-undo-variant'"
+              :size="smAndDown ? 'default' : 'small'"
+              density="comfortable"
+              variant="tonal"
+              color="warning"
+              @click.stop="openReturn(item)"
+            >
+              <span v-if="!smAndDown" class="ml-1">Return</span>
+            </v-btn>
+            <v-btn
+              v-if="hasPermission('sales.delete') && item.status !== 'voided'"
+              :icon="smAndDown ? 'mdi-close-circle' : undefined"
+              :prepend-icon="smAndDown ? undefined : 'mdi-close-circle'"
+              :size="smAndDown ? 'default' : 'small'"
+              density="comfortable"
+              variant="tonal"
+              color="error"
+              @click.stop="openVoid(item)"
+            >
+              <span v-if="!smAndDown" class="ml-1">Void</span>
+            </v-btn>
           </div>
         </template>
       </AppDataTable>
