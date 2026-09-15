@@ -284,9 +284,7 @@ watch(filters, load, { deep: true })
       </template>
 
       <template #item.type="{ item }">
-        <v-chip size="small" variant="tonal" color="primary">
-          {{ item.type }}
-        </v-chip>
+        {{ item.type }}
       </template>
 
       <template #item.amount="{ item }">
