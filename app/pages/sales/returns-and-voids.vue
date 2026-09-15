@@ -451,7 +451,6 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
     :subtitle="selectedReturn ? `Return #${selectedReturn.id} — ${selectedReturn.sale?.sale_number}` : ''"
     icon="mdi-clipboard-text"
     max-width="900"
-    scrollable
   >
     <v-card-text v-if="selectedReturn">
       <div class="d-flex justify-space-between py-1">
