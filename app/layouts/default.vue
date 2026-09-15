@@ -152,7 +152,7 @@
 
     <!-- Mobile drawer -->
     <v-navigation-drawer
-      v-if="auth.ready && auth.isLoggedIn && !mdAndUp && !hideAppChrome && !isPosPage"
+      v-if="auth.ready"
       v-model="mobileDrawer"
       temporary
       :width="260"
@@ -168,9 +168,6 @@
           contain
           class="mr-3"
         />
-        <v-avatar v-else color="primary" class="mr-3">
-          <v-icon color="white" size="24">mdi-office-building</v-icon>
-        </v-avatar>
         <div>
           <div class="text-subtitle-1 font-weight-bold">{{ company?.company_name ?? 'JmeTech' }}</div>
           <div class="text-caption text-medium-emphasis">POS SYSTEM</div>
