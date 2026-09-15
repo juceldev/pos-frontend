@@ -217,6 +217,26 @@ watch(filters, load, { deep: true })
         style="max-width: 180px"
         class="align-self-center me-4"
       />
+      <v-text-field
+        v-model="from"
+        label="From"
+        type="date"
+        clearable
+        density="compact"
+        variant="outlined"
+        style="max-width: 160px"
+        class="align-self-center me-3 d-none d-md-flex"
+      />
+      <v-text-field
+        v-model="to"
+        label="To"
+        type="date"
+        clearable
+        density="compact"
+        variant="outlined"
+        style="max-width: 160px"
+        class="align-self-center me-4 d-none d-md-flex"
+      />
       <v-badge
         :content="activeFilterCount"
         :model-value="activeFilterCount > 0"
@@ -334,13 +354,13 @@ watch(filters, load, { deep: true })
         v-model="from"
         label="From"
         type="date"
-        class="mb-4"
+        class="mb-4 d-md-none"
       />
       <v-text-field
         v-model="to"
         label="To"
         type="date"
-        class="mb-4"
+        class="mb-4 d-md-none"
       />
       <v-btn
         block
