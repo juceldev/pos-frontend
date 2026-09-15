@@ -334,39 +334,52 @@ watch(filters, load, { deep: true })
   <AppFormDialog
     v-model="showForm"
     :title="selectedExpense ? 'Edit Expense' : 'Add Expense'"
+    :max-width="500"
     :can-save="!!form.description.trim() && Number(form.amount) > 0"
     @save="saveExpense"
   >
     <AppFormSection title="Expense Details">
       <v-row dense>
-        <v-col cols="12" sm="6">
+        <v-col cols="12">
           <v-text-field
             v-model="form.expense_date"
             label="Date"
             type="date"
+            density="compact"
+            variant="outlined"
+            hide-details
           />
         </v-col>
-        <v-col cols="12" sm="6">
+        <v-col cols="12">
           <v-select
             v-model="form.type"
             label="Type"
             :items="expenseTypes.filter(t => t.value)"
             item-title="title"
             item-value="value"
+            density="compact"
+            variant="outlined"
+            hide-details
           />
         </v-col>
         <v-col cols="12">
           <v-text-field
             v-model="form.description"
             label="Description"
+            density="compact"
+            variant="outlined"
+            hide-details
           />
         </v-col>
-        <v-col cols="12" sm="6">
+        <v-col cols="12">
           <v-text-field
             v-model.number="form.amount"
             label="Amount"
             type="number"
             prefix="₱"
+            density="compact"
+            variant="outlined"
+            hide-details
           />
         </v-col>
       </v-row>
