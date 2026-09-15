@@ -88,16 +88,9 @@ const groupItems = [
 const form = reactive({
   code: '',
   name: '',
-  id_number: '',
-  barcode: '',
   contact_person: '',
   group: '',
-  vat_tin: '',
-  terms_of_payment: '',
   phone: '',
-  email: '',
-  address: '',
-  notes: '',
   is_active: true
 })
 
@@ -108,16 +101,9 @@ function openForm (customer: Customer | null = null) {
   selectedCustomer.value = customer
   form.code = customer?.code ?? ''
   form.name = customer?.name ?? ''
-  form.id_number = customer?.id_number ?? ''
-  form.barcode = customer?.barcode ?? ''
   form.contact_person = customer?.contact_person ?? ''
   form.group = customer?.group ?? ''
-  form.vat_tin = customer?.vat_tin ?? ''
-  form.terms_of_payment = customer?.terms_of_payment ?? ''
   form.phone = customer?.phone ?? ''
-  form.email = customer?.email ?? ''
-  form.address = customer?.address ?? ''
-  form.notes = customer?.notes ?? ''
   form.is_active = customer?.is_active ?? true
   showForm.value = true
 }
@@ -127,16 +113,9 @@ function closeForm () {
   selectedCustomer.value = null
   form.code = ''
   form.name = ''
-  form.id_number = ''
-  form.barcode = ''
   form.contact_person = ''
   form.group = ''
-  form.vat_tin = ''
-  form.terms_of_payment = ''
   form.phone = ''
-  form.email = ''
-  form.address = ''
-  form.notes = ''
   form.is_active = true
 }
 
@@ -357,44 +336,20 @@ watch(filters, load, { deep: true })
   >
     <AppFormSection title="Customer Details">
       <v-row dense>
-        <v-col v-if="selectedCustomer" cols="12" sm="6" md="4">
-          <v-text-field :model-value="form.code" label="Code" variant="outlined" density="compact" readonly />
-        </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-text-field v-model="form.id_number" label="ID Number" variant="outlined" density="compact" />
-        </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-text-field v-model="form.barcode" label="Barcode" variant="outlined" density="compact" />
-        </v-col>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12">
           <v-text-field v-model="form.name" label="Customer Name *" variant="outlined" density="compact" :rules="[v => !!v || 'Required']" />
         </v-col>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6">
           <v-text-field v-model="form.contact_person" label="Contact Person" variant="outlined" density="compact" />
         </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-select v-model="form.group" label="Group" :items="groupItems" item-title="title" item-value="value" variant="outlined" density="compact" clearable />
-        </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-text-field v-model="form.vat_tin" label="VAT/TIN" variant="outlined" density="compact" />
-        </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-select v-model="form.terms_of_payment" label="Terms of Payment" :items="termsOfPaymentItems" item-title="title" item-value="value" variant="outlined" density="compact" clearable />
-        </v-col>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6">
           <v-text-field v-model="form.phone" label="Phone" variant="outlined" density="compact" />
         </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-text-field v-model="form.email" label="Email" variant="outlined" density="compact" />
+        <v-col cols="12" sm="6">
+          <v-select v-model="form.group" label="Group" :items="groupItems" item-title="title" item-value="value" variant="outlined" density="compact" clearable />
         </v-col>
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" sm="6">
           <v-select v-model="form.is_active" label="Status" :items="[{ title: 'Active', value: true }, { title: 'Inactive', value: false }]" item-title="title" item-value="value" variant="outlined" density="compact" />
-        </v-col>
-        <v-col cols="12">
-          <v-textarea v-model="form.address" label="Address" variant="outlined" density="compact" rows="2" />
-        </v-col>
-        <v-col cols="12">
-          <v-textarea v-model="form.notes" label="Notes / Comments" variant="outlined" density="compact" rows="2" />
         </v-col>
       </v-row>
     </AppFormSection>
