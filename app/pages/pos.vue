@@ -71,12 +71,21 @@ const filteredCustomers = computed(() => {
 })
 const customerForm = reactive({
   name: '',
+  contact_person: '',
   phone: '',
-  email: '',
-  address: '',
-  id_number: '',
+  group: '',
   is_active: true
 })
+
+const customerGroupItems = [
+  { title: 'Walk-in', value: 'walk-in' },
+  { title: 'Regular', value: 'regular' },
+  { title: 'VIP', value: 'vip' },
+  { title: 'Wholesale', value: 'wholesale' },
+  { title: 'Retail', value: 'retail' },
+  { title: 'Corporate', value: 'corporate' },
+  { title: 'Consignment', value: 'consignment' }
+]
 
 // Discount dialog
 const showDiscountDialog = ref(false)
@@ -391,10 +400,9 @@ function generateOrderNumber (): string {
 
 function openCustomerDialog () {
   customerForm.name = ''
+  customerForm.contact_person = ''
   customerForm.phone = ''
-  customerForm.email = ''
-  customerForm.address = ''
-  customerForm.id_number = ''
+  customerForm.group = ''
   customerForm.is_active = true
   customerAddMode.value = false
   customerFilter.value = ''
@@ -961,11 +969,11 @@ onUnmounted(() => {
         </v-list>
       </v-card-text>
       <v-card-text v-else>
-        <v-text-field v-model="customerForm.name" label="Name *" variant="outlined" density="compact" class="mb-3" />
+        <v-text-field v-model="customerForm.name" label="Customer Name *" variant="outlined" density="compact" class="mb-3" />
+        <v-text-field v-model="customerForm.contact_person" label="Contact Person" variant="outlined" density="compact" class="mb-3" />
         <v-text-field v-model="customerForm.phone" label="Phone" variant="outlined" density="compact" class="mb-3" />
-        <v-text-field v-model="customerForm.email" label="Email" variant="outlined" density="compact" class="mb-3" />
-        <v-text-field v-model="customerForm.id_number" label="ID Number" variant="outlined" density="compact" class="mb-3" />
-        <v-textarea v-model="customerForm.address" label="Address" rows="2" variant="outlined" density="compact" />
+        <v-select v-model="customerForm.group" label="Group" :items="customerGroupItems" item-title="title" item-value="value" variant="outlined" density="compact" class="mb-3" clearable />
+        <v-select v-model="customerForm.is_active" label="Status" :items="[{ title: 'Active', value: true }, { title: 'Inactive', value: false }]" item-title="title" item-value="value" variant="outlined" density="compact" />
       </v-card-text>
       <v-card-actions>
         <v-spacer v-if="customerAddMode" />
