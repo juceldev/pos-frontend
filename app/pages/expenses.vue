@@ -231,7 +231,7 @@ watch(filters, load, { deep: true })
         clearable
         density="compact"
         variant="outlined"
-        style="max-width: 160px"
+        style="max-width: 200px"
         class="align-self-center me-3 d-none d-md-flex"
       />
       <v-text-field
@@ -241,7 +241,7 @@ watch(filters, load, { deep: true })
         clearable
         density="compact"
         variant="outlined"
-        style="max-width: 160px"
+        style="max-width: 200px"
         class="align-self-center me-4 d-none d-md-flex"
       />
       <v-badge
