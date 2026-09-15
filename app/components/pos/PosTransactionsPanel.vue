@@ -66,7 +66,7 @@ const headers = [
   { title: 'Total', key: 'total', sortable: false, align: 'end' as const },
   { title: 'Status', key: 'status', sortable: false },
   { title: 'Date', key: 'created_at', sortable: false },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const, width: '120px' }
+  { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const, width: '240px' }
 ]
 
 const selectedSale = ref<Sale | null>(null)
@@ -237,7 +237,7 @@ onMounted(load)
 
         <template #item.status="{ item }">
           <v-chip
-            size="x-small"
+            size="small"
             :color="item.status === 'partially_returned' && hasApprovedReturn(item) ? 'info' : statusColor(item.status ?? '')"
             variant="tonal"
           >
@@ -250,48 +250,40 @@ onMounted(load)
         </template>
 
         <template #item.actions="{ item }">
-          <div class="d-flex justify-end ga-1">
-            <v-tooltip text="Receipt" location="top">
-              <template #activator="{ props: tipProps }">
-                <v-btn
-                  v-bind="tipProps"
-                  icon="mdi-receipt-text"
-                  :size="smAndDown ? 'default' : 'small'"
-                  density="comfortable"
-                  variant="tonal"
-                  color="primary"
-                  @click.stop="viewSale(item)"
-                />
-              </template>
-            </v-tooltip>
-            <v-tooltip text="Return" location="top">
-              <template #activator="{ props: tipProps }">
-                <v-btn
-                  v-bind="tipProps"
-                  v-if="hasPermission('sales.edit') && canReturn(item)"
-                  icon="mdi-undo-variant"
-                  :size="smAndDown ? 'default' : 'small'"
-                  density="comfortable"
-                  variant="tonal"
-                  color="warning"
-                  @click.stop="openReturn(item)"
-                />
-              </template>
-            </v-tooltip>
-            <v-tooltip text="Void" location="top">
-              <template #activator="{ props: tipProps }">
-                <v-btn
-                  v-bind="tipProps"
-                  v-if="hasPermission('sales.delete') && item.status !== 'voided'"
-                  icon="mdi-close-circle"
-                  :size="smAndDown ? 'default' : 'small'"
-                  density="comfortable"
-                  variant="tonal"
-                  color="error"
-                  @click.stop="openVoid(item)"
-                />
-              </template>
-            </v-tooltip>
+          <div class="d-flex justify-end ga-2 align-center">
+            <div class="d-flex align-center">
+              <v-btn
+                icon="mdi-receipt-text"
+                :size="smAndDown ? 'default' : 'small'"
+                density="comfortable"
+                variant="tonal"
+                color="primary"
+                @click.stop="viewSale(item)"
+              />
+              <span class="d-none d-sm-inline text-caption ml-1">Receipt</span>
+            </div>
+            <div v-if="hasPermission('sales.edit') && canReturn(item)" class="d-flex align-center">
+              <v-btn
+                icon="mdi-undo-variant"
+                :size="smAndDown ? 'default' : 'small'"
+                density="comfortable"
+                variant="tonal"
+                color="warning"
+                @click.stop="openReturn(item)"
+              />
+              <span class="d-none d-sm-inline text-caption ml-1">Return</span>
+            </div>
+            <div v-if="hasPermission('sales.delete') && item.status !== 'voided'" class="d-flex align-center">
+              <v-btn
+                icon="mdi-close-circle"
+                :size="smAndDown ? 'default' : 'small'"
+                density="comfortable"
+                variant="tonal"
+                color="error"
+                @click.stop="openVoid(item)"
+              />
+              <span class="d-none d-sm-inline text-caption ml-1">Void</span>
+            </div>
           </div>
         </template>
       </AppDataTable>
