@@ -302,6 +302,7 @@ watch(filters, load, { deep: true })
       :items="expenses"
       :items-length="meta.total"
       :loading="loading"
+      density="compact"
       empty-text="No expenses found"
     >
       <template #item.expense_date="{ item }">
