@@ -332,6 +332,7 @@ watch(filters, load, { deep: true })
     v-model="showForm"
     :title="selectedCustomer ? 'Edit Customer' : 'Add Customer'"
     :can-save="!!form.name.trim()"
+    :max-width="600"
     @save="saveCustomer"
   >
     <AppFormSection title="Customer Details">
