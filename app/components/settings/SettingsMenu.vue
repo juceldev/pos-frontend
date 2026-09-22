@@ -6,12 +6,12 @@ const items = [
   { key: 'sales', title: 'Sales Transaction', subtitle: 'Default Auto/Settings', icon: 'mdi-cart' },
   { key: 'printer', title: 'POS Printers', subtitle: 'Receipt & Settings', icon: 'mdi-printer' },
   { key: 'users', title: 'Users | Operators', subtitle: 'List / Registered', icon: 'mdi-account' },
-  { key: 'access', title: 'User Level Access', subtitle: 'Rights & Protection', icon: 'mdi-shield-account' },
-  { key: 'photos', title: 'Photos & Logos', subtitle: 'Theme Designs', icon: 'mdi-image' },
-  { key: 'hardware', title: 'Hardware & Other', subtitle: 'Setting Options', icon: 'mdi-desktop-tower' },
-  { key: 'database', title: 'Master Database', subtitle: 'Backup and Resets (F10 to Reset)', icon: 'mdi-database' },
-  { key: 'datetime', title: 'Date & Time', subtitle: 'Set Date & Time', icon: 'mdi-clock' },
-  { key: 'backup', title: 'Back-up Settings', subtitle: 'Backup Manager', icon: 'mdi-backup-restore' }
+  // { key: 'access', title: 'User Level Access', subtitle: 'Rights & Protection', icon: 'mdi-shield-account' },
+  // { key: 'photos', title: 'Photos & Logos', subtitle: 'Theme Designs', icon: 'mdi-image' },
+  // { key: 'hardware', title: 'Hardware & Other', subtitle: 'Setting Options', icon: 'mdi-desktop-tower' },
+  { key: 'database', title: 'Master Database', subtitle: 'Backup and Database', icon: 'mdi-database' },
+  // { key: 'datetime', title: 'Date & Time', subtitle: 'Set Date & Time', icon: 'mdi-clock' },
+  // { key: 'backup', title: 'Back-up Settings', subtitle: 'Backup Manager', icon: 'mdi-backup-restore' }
 ]
 </script>
 

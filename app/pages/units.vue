@@ -98,8 +98,15 @@ async function saveUnit () {
   }
 }
 
+const { confirm } = useConfirm()
+
 async function handleDelete (unit: Unit) {
-  if (!confirm(`Delete unit ${unit.name}?`)) return
+  const confirmed = await confirm({
+    title: 'Delete Unit',
+    message: `Delete unit "${unit.name}"?`,
+    confirmText: 'Delete'
+  })
+  if (!confirmed) return
   const ok = await deleteUnit(unit.id)
   if (ok) {
     await load()

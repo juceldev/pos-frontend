@@ -31,6 +31,7 @@ const {
 const { categories, fetchCategories } = useCategories()
 const { suppliers, fetchSuppliers } = useSuppliers()
 const { notify } = useNotification()
+const { confirm } = useConfirm()
 const { printBarcodes } = useBarcodePrint()
 
 const selectedProducts = ref<Product[]>([])
@@ -180,19 +181,14 @@ async function handleSave (data: ProductFormData) {
   }
 }
 
-const showDeleteConfirm = ref(false)
-const productToDelete = ref<Product | null>(null)
+async function handleDelete (product: Product) {
+  if (!await confirm({
+    title: 'Delete Product',
+    message: `Delete product ${product.name}?`,
+    confirmText: 'Delete'
+  })) return
 
-function handleDelete (product: Product) {
-  productToDelete.value = product
-  showDeleteConfirm.value = true
-}
-
-async function confirmDelete () {
-  if (!productToDelete.value) return
-  const success = await deleteProduct(productToDelete.value.id)
-  showDeleteConfirm.value = false
-  productToDelete.value = null
+  const success = await deleteProduct(product.id)
   if (success) {
     notify('Product deleted', 'success')
     await load()
@@ -256,6 +252,7 @@ async function handleBulkUpload () {
         <v-btn
           color="primary"
           prepend-icon="mdi-plus"
+          size="small"
           @click="openForm()"
         >
           Add New
@@ -264,6 +261,8 @@ async function handleBulkUpload () {
           v-if="selectedProducts.length"
           color="indigo"
           prepend-icon="mdi-barcode"
+          size="small"
+          class="mx-2"
           @click="printSelectedBarcodes"
         >
           Print Barcode ({{ selectedProducts.length }})
@@ -271,6 +270,8 @@ async function handleBulkUpload () {
         <v-btn
           color="secondary"
           prepend-icon="mdi-upload"
+          size="small"
+          :class="selectedProducts.length ? 'mx-0':'mx-2'"
           @click="showBulkDialog = true"
         >
           Bulk Upload
@@ -466,15 +467,6 @@ async function handleBulkUpload () {
         </v-list>
       </v-card-text>
     </AppDialog>
-
-    <AppConfirmDialog
-      v-model="showDeleteConfirm"
-      title="Delete Product"
-      :message="`Delete product ${productToDelete?.name ?? ''}?`"
-      confirm-text="Delete"
-      :loading="productsLoading"
-      @confirm="confirmDelete"
-    />
 
     <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="6000">
       {{ snackbarText }}

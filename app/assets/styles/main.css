@@ -25,9 +25,30 @@ html {
   font-size: 0.875rem;
 }
 
+/* Mobile: smaller page header typography */
+@media (max-width: 959px) {
+  .page-title {
+    font-size: 1.1rem;
+    line-height: 1.2;
+  }
+  .page-subtitle {
+    font-size: 0.75rem;
+  }
+}
+
 /* Card utilities */
 .app-card {
   padding: 1rem;
+}
+
+@media (max-width: 599px) {
+  .app-card {
+    padding: 0.5rem;
+  }
+
+  .app-card .v-card-text {
+    padding: 12px;
+  }
 }
 
 .stat-card {
@@ -71,7 +92,7 @@ html {
 
 /* Solid floating labels on outlined fields */
 .v-field--variant-outlined .v-label.v-field-label--floating {
-  background-color: rgb(var(--v-theme-surface));
+  /* background-color: rgb(var(--v-theme-surface)); */
   color: rgba(var(--v-theme-on-surface), 0.9);
   font-weight: 500;
   padding: 0 4px;
@@ -107,7 +128,7 @@ html {
 .app-table.product-table th:nth-child(4),
 .app-table.product-table td:nth-child(4) {
   position: sticky;
-  background-color: rgb(var(--v-theme-surface));
+  /* background-color: rgb(var(--v-theme-surface)); */
 }
 
 .app-table.product-table td:nth-child(3),
@@ -138,11 +159,6 @@ html {
 }
 
 /* Keep zebra striping opaque on sticky cells */
-.app-table.product-table tbody tr:nth-of-type(odd) td:nth-child(3),
-.app-table.product-table tbody tr:nth-of-type(odd) td:nth-child(4) {
-  background-color: rgb(var(--v-theme-surface));
-}
-
 .app-table.product-table tbody tr:nth-of-type(even) td:nth-child(3),
 .app-table.product-table tbody tr:nth-of-type(even) td:nth-child(4) {
   background-color: color-mix(in srgb, rgb(var(--v-theme-surface)) 93%, rgb(var(--v-theme-primary)));
@@ -241,13 +257,32 @@ html {
   position: sticky;
   top: 0;
   z-index: 1;
-  background-color: rgb(var(--v-theme-surface));
+  /* background-color: rgb(var(--v-theme-surface)); */
 }
 
 /* Receipt print styles */
 @media print {
   body * {
     visibility: hidden;
+  }
+
+  /* Neutralize dialog/overlay positioning so the receipt prints at the top of the page */
+  .v-overlay,
+  .v-overlay__scrim,
+  .v-overlay__content,
+  .v-dialog {
+    position: static !important;
+    transform: none !important;
+    display: block !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: none !important;
   }
 
   #receipt-print,
@@ -259,10 +294,13 @@ html {
     position: absolute;
     left: 0;
     top: 0;
-    width: auto !important;
-    max-width: 100%;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
     box-shadow: none !important;
     border: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
   }
 
   #receipt-print .receipt-thermal {
@@ -270,17 +308,21 @@ html {
     box-shadow: none !important;
   }
 
-  #receipt-print .receipt-thermal--bond {
-    width: 5.5in;
-    min-height: 8.5in;
+  #receipt-print .receipt-bond {
+    width: 100%;
+    max-width: 100% !important;
+    min-height: 0 !important;
     box-shadow: none !important;
+    border: none !important;
+  }
+
+  #receipt-print .v-card-text {
+    padding: 0 !important;
+    overflow: visible !important;
+    max-height: none !important;
   }
 
   #receipt-print .v-card-title,
-  #receipt-print .v-card-text {
-    padding: 4px 8px !important;
-  }
-
   #receipt-print .v-card-actions,
   #receipt-print .receipt-actions {
     display: none !important;
@@ -289,4 +331,109 @@ html {
   #receipt-print .v-divider {
     margin: 4px 0 !important;
   }
+}
+/* Toolbar filters: keep usable widths on desktop, shrink on small screens */
+.v-toolbar .v-input {
+  flex: 0 1 auto;
+}
+
+@media (min-width: 960px) {
+  .v-toolbar .v-input {
+    min-width: 160px;
+    flex: 1 1 auto;
+  }
+
+  .v-toolbar__content {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 959px) {
+  .v-toolbar .v-input {
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+/* iOS Safari: size fullscreen dialogs to the visible viewport so bottom
+   actions are not hidden behind the browser toolbar / home indicator */
+.v-dialog--fullscreen > .v-overlay__content {
+  height: -webkit-fill-available;
+}
+
+@supports (height: 100dvh) {
+  .v-dialog--fullscreen > .v-overlay__content {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .v-dialog--fullscreen > .v-overlay__content > .v-card > .v-card-text,
+  .v-dialog--fullscreen > .v-overlay__content > form > .v-card > .v-card-text {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .v-dialog .v-card-actions,
+  .v-bottom-sheet__content .v-card-actions {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
+/* iOS Safari repaint quirk: icons inside overlay content can fail to paint */
+.v-overlay__content .v-icon,
+.v-overlay__content .v-btn--icon {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Pin dialog action bars to the bottom of the visible viewport on mobile:
+   the card becomes a flex column, v-card-text scrolls internally, and
+   v-card-actions stays fixed above the browser chrome (esp. iOS Safari) */
+.v-dialog--fullscreen > .v-overlay__content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.v-dialog--fullscreen > .v-overlay__content > .v-card,
+.v-dialog--fullscreen > .v-overlay__content > form > .v-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Middle children fill the height and scroll internally.
+   :where() keeps specificity low so wrapper overrides below win. */
+.v-dialog--fullscreen .v-card > :where(:not(.v-card-title, .v-card-item, .v-toolbar, .v-card-actions, .v-progress-linear)) {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Wrapper elements (v-form, divs) that contain their own card-text + actions
+   must NOT scroll themselves: pass the flex column through so the inner
+   card-text scrolls and the inner actions stay pinned at the bottom */
+.v-dialog--fullscreen .v-card > form,
+.v-dialog--fullscreen .v-card > div:has(> .v-card-actions) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.v-dialog--fullscreen .v-card > form > .v-card-text,
+.v-dialog--fullscreen .v-card > div:has(> .v-card-actions) > .v-card-text,
+.v-dialog--fullscreen .v-card > div:has(> .v-card-actions) > .v-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.v-dialog--fullscreen .v-card > .v-card-actions,
+.v-dialog--fullscreen .v-card > form > .v-card-actions,
+.v-dialog--fullscreen .v-card > div > .v-card-actions {
+  flex: 0 0 auto;
 }

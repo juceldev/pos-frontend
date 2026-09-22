@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { formatAmount } from '~/utils/format'
 import type { Product } from '~/types/product'
+import { useDisplay } from 'vuetify'
 
 const props = defineProps<{
   items: Product[]
@@ -21,6 +22,7 @@ const emit = defineEmits<{
 }>()
 
 const { hasPermission } = usePermission()
+const { mobile } = useDisplay()
 
 const headers = [
   { title: 'Sequence', key: 'product_sequence', align: 'start', sortable: false, width: '110px' },
@@ -31,7 +33,7 @@ const headers = [
   { title: 'Stocks', key: 'stocks', align: 'start', sortable: false, width: '90px' },
   { title: 'Cost', key: 'cost_price', align: 'start', sortable: true },
   { title: 'Retail', key: 'regular_price', align: 'start', sortable: true },
-  { title: 'Wholesale', key: 'wholesale_price', align: 'start', sortable: true, width: '100px' },
+  { title: 'Warranty', key: 'warranty_period', align: 'start', sortable: true },
   { title: 'Category', key: 'category.name', align: 'start', sortable: false },
   { title: 'Status', key: 'is_active', align: 'start', sortable: false, width: '100px' },
   { title: '', key: 'actions', align: 'center', sortable: false, width: '56px' }
@@ -125,6 +127,7 @@ function onTableScroll () {
 
 <template>
   <v-data-table-server
+    v-if="!mobile"
     ref="tableRef"
     v-model:page="localPage"
     v-model:items-per-page="localPerPage"
@@ -162,8 +165,8 @@ function onTableScroll () {
     <template #item.regular_price="{ item }">
       {{ formatAmount(itemValue(item, 'regular_price')) }}
     </template>
-    <template #item.wholesale_price="{ item }">
-      {{ formatAmount(itemValue(item, 'wholesale_price')) }}
+    <template #item.warranty_period="{ item }">
+      {{ itemValue(item, 'warranty_period') || '—' }}
     </template>
     <template #item.stocks="{ item }">
       {{ stockDisplay(rawItem(item)) }}
@@ -207,6 +210,81 @@ function onTableScroll () {
       <AppEmptyState title="No products found" subtitle="Try adjusting your filters" />
     </template>
   </v-data-table-server>
+
+  <!-- Mobile: card list -->
+  <div v-else class="mobile-product-list">
+    <v-progress-linear v-if="loading" indeterminate color="primary" class="my-4" />
+    <AppEmptyState v-else-if="!items.length" title="No products found" subtitle="Try adjusting your filters" />
+
+    <v-card
+      v-for="item in items"
+      :key="item.id"
+      variant="outlined"
+      class="mb-2"
+    >
+      <div class="mobile-product-header pa-3 d-flex align-center justify-space-between">
+        <div class="min-w-0 flex-1">
+          <div class="text-caption text-medium-emphasis">Product</div>
+          <div class="font-weight-bold text-primary text-break">{{ item.name }}</div>
+        </div>
+        <v-menu v-if="hasPermission('products.edit') || hasPermission('products.delete')" location="bottom end">
+          <template #activator="{ props: menuProps }">
+            <v-btn v-bind="menuProps" icon="mdi-dots-vertical" variant="text" size="small" density="compact" aria-label="Actions" />
+          </template>
+          <v-list density="compact">
+            <v-list-item v-if="hasPermission('products.edit')" prepend-icon="mdi-pencil" title="Edit" @click="emit('edit', item)" />
+            <v-list-item v-if="hasPermission('products.delete')" prepend-icon="mdi-delete" title="Delete" base-color="error" @click="emit('delete', item)" />
+          </v-list>
+        </v-menu>
+      </div>
+
+      <v-divider />
+
+      <v-card-text class="pa-2 pb-1">
+        <div class="mobile-product-row">
+          <span class="mobile-product-label">Barcode:</span>
+          <span class="mobile-product-value">{{ item.barcode ?? '—' }}</span>
+        </div>
+        <div class="mobile-product-row">
+          <span class="mobile-product-label">Brand:</span>
+          <span class="mobile-product-value">{{ item.brand_name || item.brand_data?.name || item.brand || '—' }}</span>
+        </div>
+        <div class="mobile-product-row">
+          <span class="mobile-product-label">Unit:</span>
+          <span class="mobile-product-value">{{ item.unit?.abbreviation ?? '—' }}</span>
+        </div>
+        <div class="mobile-product-row">
+          <span class="mobile-product-label">Stocks:</span>
+          <span class="mobile-product-value">{{ stockDisplay(item) }}</span>
+        </div>
+        <div class="mobile-product-row">
+          <span class="mobile-product-label">Cost:</span>
+          <span class="mobile-product-value">{{ formatAmount(item.cost_price) }}</span>
+        </div>
+        <div class="mobile-product-row">
+          <span class="mobile-product-label">Retail:</span>
+          <span class="mobile-product-value">{{ formatAmount(item.regular_price) }}</span>
+        </div>
+        <div class="mobile-product-row">
+          <span class="mobile-product-label">Warranty:</span>
+          <span class="mobile-product-value">{{ item.warranty_period || '—' }}</span>
+        </div>
+        <div class="mobile-product-row">
+          <span class="mobile-product-label">Category:</span>
+          <span class="mobile-product-value">{{ item.category?.name ?? '—' }}</span>
+        </div>
+        <div class="mobile-product-row">
+          <span class="mobile-product-label">Status:</span>
+          <span class="mobile-product-value">
+            <span class="status-indicator" :class="item.is_active ? 'text-success' : 'text-medium-emphasis'">
+              <span class="status-dot" :class="item.is_active ? 'bg-success' : 'bg-grey'" />
+              {{ item.is_active ? 'Active' : 'Inactive' }}
+            </span>
+          </span>
+        </div>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <style scoped>
@@ -246,5 +324,25 @@ function onTableScroll () {
 
 .product-table :deep(tbody tr.v-data-table__tr--selected) {
   background-color: rgba(var(--v-theme-primary), 0.08);
+}
+
+.mobile-product-list { padding-top: 8px; }
+.mobile-product-header { background: rgba(var(--v-theme-primary), 0.06); }
+.mobile-product-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+.mobile-product-label {
+  font-weight: 500;
+  color: rgba(var(--v-theme-on-surface), 0.7);
+  min-width: 80px;
+}
+.mobile-product-value {
+  word-break: break-word;
+  flex: 1;
 }
 </style>

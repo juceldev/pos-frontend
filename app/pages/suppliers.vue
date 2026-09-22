@@ -152,8 +152,15 @@ async function saveSupplier () {
   }
 }
 
+const { confirm } = useConfirm()
+
 async function handleDelete (supplier: Supplier) {
-  if (!confirm(`Delete supplier ${supplier.name}?`)) return
+  const confirmed = await confirm({
+    title: 'Delete Supplier',
+    message: `Delete supplier "${supplier.name}"?`,
+    confirmText: 'Delete'
+  })
+  if (!confirmed) return
   const ok = await deleteSupplier(supplier.id)
   if (ok) {
     await load()

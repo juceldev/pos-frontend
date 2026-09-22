@@ -90,20 +90,21 @@ onMounted(async () => {
         </v-card-text>
       </v-card>
 
-      <!-- Sales trend + Category sales -->
-      <div class="dash-grid-2-1">
-        <SalesTrendChart :data="data.sales_trend" />
+      <!-- Income vs Expenses + Category sales -->
+      <div class="dash-grid-9-4">
+        <IncomeExpenseChart :income="data.sales_trend" :expenses="data.expenses_trend" />
         <CategorySalesChart :data="data.category_sales" />
       </div>
 
-      <!-- Two columns -->
-      <div class="dash-grid-2">
+      <!-- Sales trend + Payment methods -->
+      <div class="dash-grid-9-4">
+        <SalesTrendChart :data="data.sales_trend" />
         <PaymentBreakdownChart :data="data.payment_breakdown" />
-        <TopProductsChart :data="data.top_products" />
       </div>
 
       <!-- Bottom row -->
-      <div class="dash-grid-2-3">
+      <div class="dash-grid-4">
+        <TopProductsChart :data="data.top_products" />
         <RecentTransactions :sales="data.recent_transactions" />
         <InventoryAlerts :products="data.low_stock_products" />
       </div>
@@ -159,29 +160,22 @@ onMounted(async () => {
   padding: 48px 0;
 }
 
-.dash-grid-2 {
+.dash-grid-9-4 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 9fr 4fr;
   gap: 12px;
 }
 
-.dash-grid-2-1 {
+.dash-grid-4 {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 12px;
-}
-
-.dash-grid-2-3 {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
 /* Tablet */
 @media (max-width: 960px) {
-  .dash-grid-2,
-  .dash-grid-2-1,
-  .dash-grid-2-3 {
+  .dash-grid-9-4,
+  .dash-grid-4 {
     grid-template-columns: 1fr;
   }
 }

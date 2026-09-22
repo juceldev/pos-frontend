@@ -54,18 +54,31 @@
 
 /* Mobile drawer */
 .mobile-nav-drawer .v-navigation-drawer__content {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+.mobile-nav-drawer .mobile-nav-main {
+  flex: 1 1 auto !important;
   overflow-y: auto !important;
-  display: flex;
-  flex-direction: column;
+  min-height: 0;
+}
+
+.mobile-nav-drawer .mobile-nav-actions {
+  flex: 0 0 auto !important;
 }
 
 .mobile-nav-drawer .v-list {
   padding-top: 4px;
   padding-bottom: 4px;
+  gap: 2px;
 }
 
 .mobile-nav-drawer .v-list-item {
-  min-height: 36px;
+  min-height: 32px;
   padding-inline-start: 8px;
   padding-inline-end: 8px;
 }
@@ -75,18 +88,26 @@
 }
 
 .mobile-nav-drawer .v-list-group__items .v-list-item {
-  padding-inline-start: 24px;
+  padding-inline-start: 20px;
 }
 
 /* Mobile: collapse filter inputs, keep only search */
-@media (max-width: 959px) {
-  .app-card > .v-toolbar .v-text-field:not(:first-child),
+@media (max-width: 599px) {
+  .app-card > .v-toolbar {
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  .app-card > .v-toolbar .v-text-field:not(:first-of-type),
   .app-card > .v-toolbar .v-select,
   .app-card > .v-toolbar .v-autocomplete {
     display: none !important;
   }
 
-  .app-card > .v-toolbar .v-text-field:first-child {
+  .app-card > .v-toolbar .v-text-field:first-of-type {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0;

@@ -4,8 +4,10 @@ import UserAccessPanel from '~/components/settings/UserAccessPanel.vue'
 import SalesTransactionPanel from '~/components/settings/SalesTransactionPanel.vue'
 import PrinterPanel from '~/components/settings/PrinterPanel.vue'
 import UsersPanel from '~/components/settings/UsersPanel.vue'
+import DatabasePanel from '~/components/settings/DatabasePanel.vue'
 import SettingsMenu from '~/components/settings/SettingsMenu.vue'
 import { useCategories } from '~/composables/useCategories'
+import { useNotification } from '~/composables/useNotification'
 import { usePermission } from '~/composables/usePermission'
 import { useSettings } from '~/composables/useSettings'
 
@@ -14,7 +16,8 @@ definePageMeta({
 })
 
 const menu = ref('company')
-const { company, salesTransaction, printer, loading, fetchSettings, saveCompany, saveSalesTransaction, savePrinter } = useSettings()
+const { company, salesTransaction, printer, loading, error, fetchSettings, saveCompany, saveSalesTransaction, savePrinter } = useSettings()
+const { success: notifySuccess, error: notifyError } = useNotification()
 const { categories, fetchCategories } = useCategories()
 const { hasPermission } = usePermission()
 const canEdit = computed(() => hasPermission('settings.edit'))
@@ -39,18 +42,27 @@ watch([company, salesTransaction, printer], syncForms, { deep: true })
 async function saveCompanySettings () {
   if (await saveCompany(companyForm.value)) {
     company.value = { ...companyForm.value }
+    notifySuccess('Company settings saved')
+  } else {
+    notifyError(error.value || 'Failed to save company settings')
   }
 }
 
 async function saveSalesSettings () {
   if (await saveSalesTransaction(salesForm.value)) {
     salesTransaction.value = { ...salesForm.value }
+    notifySuccess('Sales transaction settings saved')
+  } else {
+    notifyError(error.value || 'Failed to save sales transaction settings')
   }
 }
 
 async function savePrinterSettings () {
   if (await savePrinter(printerForm.value)) {
     printer.value = { ...printerForm.value }
+    notifySuccess('Printer settings saved')
+  } else {
+    notifyError(error.value || 'Failed to save printer settings')
   }
 }
 </script>
@@ -97,6 +109,10 @@ async function savePrinterSettings () {
 
         <UsersPanel
           v-else-if="menu === 'users'"
+        />
+
+        <DatabasePanel
+          v-else-if="menu === 'database'"
         />
 
         <div v-else class="text-center text-medium-emphasis py-10">

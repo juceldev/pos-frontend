@@ -153,7 +153,7 @@ function hasApprovedReturn (sale: Sale): boolean {
 }
 
 function printReceipt () {
-  window.print()
+  printElementById('receipt-print', 'Sale Receipt')
 }
 
 onMounted(load)
@@ -263,7 +263,7 @@ onMounted(load)
               <span v-if="!smAndDown" class="ml-1">Receipt</span>
             </v-btn>
             <v-btn
-              v-if="hasPermission('sales.edit') && canReturn(item)"
+              v-if="hasPermission('returns.create') && canReturn(item)"
               :icon="smAndDown ? 'mdi-undo-variant' : undefined"
               :prepend-icon="smAndDown ? undefined : 'mdi-undo-variant'"
               :size="smAndDown ? 'default' : 'small'"

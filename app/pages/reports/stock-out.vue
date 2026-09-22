@@ -7,7 +7,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { loading, error, fetchStockOutReport } = useReports()
+const { loading, error, pdfDialog, pdfUrl, pdfTitle, fetchStockOutReport, openStockOutReportPdf } = useReports()
 
 const dateFrom = ref(new Date().toISOString().split('T')[0])
 const dateTo = ref(new Date().toISOString().split('T')[0])
@@ -22,6 +22,7 @@ async function load () {
   const response = await fetchStockOutReport({
     date_from: dateFrom.value,
     date_to: dateTo.value,
+    search: search.value || undefined,
     page: page.value,
     per_page: perPage.value
   })
@@ -30,6 +31,15 @@ async function load () {
     meta.value = { total: response.meta.total }
   }
 }
+
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+watch(search, () => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    page.value = 1
+    load()
+  }, 400)
+})
 
 watch([dateFrom, dateTo, page, perPage], load)
 onMounted(load)
@@ -72,20 +82,25 @@ onMounted(load)
             hide-details
           />
         </v-col>
-        <v-col cols="12" md="auto" class="d-flex justify-end">
-          <v-tooltip text="Refresh" location="top">
-            <template #activator="{ props: tipProps }">
-              <v-btn
-                v-bind="tipProps"
-                icon="mdi-refresh"
-                variant="text"
-                size="small"
-                aria-label="Refresh"
-                :loading="loading"
-                @click="load"
-              />
-            </template>
-          </v-tooltip>
+        <v-col cols="12" md="auto" class="d-flex justify-end gap-2">
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-file-pdf-box"
+            size="small"
+            @click="openStockOutReportPdf(dateFrom, dateTo)"
+          >
+            <span class="d-none d-sm-inline">Generate PDF</span>
+            <v-icon class="d-sm-none" />
+          </v-btn>
+          <v-btn
+            prepend-icon="mdi-refresh"
+            variant="text"
+            size="small"
+            :loading="loading"
+            @click="load"
+          >
+            Refresh
+          </v-btn>
         </v-col>
       </v-row>
       <v-divider />
@@ -126,5 +141,7 @@ onMounted(load)
 
       <v-alert v-if="error" type="error" class="ma-4">{{ error }}</v-alert>
     </AppCard>
+
+    <PdfPreviewDialog v-model="pdfDialog" :url="pdfUrl" :title="pdfTitle" />
   </div>
 </template>

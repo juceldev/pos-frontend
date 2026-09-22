@@ -14,7 +14,7 @@ const icon = computed(() => ({
     v-model="notification.show"
     :color="notification.color"
     :timeout="notification.timeout"
-    location="top right"
+    location="bottom right"
   >
     <div class="d-flex align-center">
       <v-icon size="18" class="mr-2">{{ icon }}</v-icon>

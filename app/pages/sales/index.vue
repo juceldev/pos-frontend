@@ -10,6 +10,8 @@ const { sales, meta, loading, error, currentSale, fetchSales, fetchSale } = useS
 
 const search = ref('')
 const status = ref<string | null>(null)
+const from = ref<string>('')
+const to = ref<string>('')
 const page = ref(1)
 const perPage = ref(15)
 const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([{ key: 'created_at', order: 'desc' }])
@@ -27,12 +29,14 @@ const filters = computed(() => ({
   per_page: perPage.value,
   search: search.value || undefined,
   status: status.value || undefined,
+  from: from.value || undefined,
+  to: to.value || undefined,
   sort_by: sortBy.value[0]?.key ?? 'created_at',
   sort_direction: sortBy.value[0]?.order ?? 'desc'
 }))
 
 const activeFilterCount = computed(() =>
-  [status.value].filter(v => v !== null && v !== undefined).length
+  [status.value, from.value, to.value].filter(v => v !== null && v !== undefined && v !== '').length
 )
 
 const activeFilters = computed(() => {
@@ -41,12 +45,16 @@ const activeFilters = computed(() => {
     const item = statusFilterItems.find(i => i.value === status.value)
     list.push({ key: 'status', label: `Status: ${item?.title ?? status.value}`, clear: () => { status.value = null } })
   }
+  if (from.value) list.push({ key: 'from', label: `From: ${from.value}`, clear: () => { from.value = '' } })
+  if (to.value) list.push({ key: 'to', label: `To: ${to.value}`, clear: () => { to.value = '' } })
   return list
 })
 
 function clearAllFilters () {
   search.value = ''
   status.value = null
+  from.value = ''
+  to.value = ''
 }
 
 async function load () {
@@ -101,8 +109,8 @@ watch(filters, load, { deep: true })
         clearable
         density="compact"
         variant="outlined"
-        style="max-width: 400px"
-        class="align-self-center me-3"
+        style="max-width: 400px; min-width: 0"
+        class="align-self-center me-3 flex-grow-1"
       />
       <v-select
         v-model="status"
@@ -114,7 +122,7 @@ watch(filters, load, { deep: true })
         density="compact"
         variant="outlined"
         style="max-width: 180px"
-        class="align-self-center me-4"
+        class="align-self-center me-4 d-none d-md-flex"
       />
       <v-badge
         :content="activeFilterCount"
@@ -203,6 +211,33 @@ watch(filters, load, { deep: true })
       <template #item.actions="{ item }">
         <v-btn icon="mdi-eye" variant="text" size="small" @click="viewSale(item)" />
       </template>
+
+      <template #mobile-item="{ item }">
+        <div class="pa-3 sale-card" role="button" tabindex="0" @click="viewSale(item)" @keydown.enter="viewSale(item)">
+          <div class="d-flex align-center justify-space-between mb-1">
+            <span class="font-weight-bold text-primary">{{ item.sale_number }}</span>
+            <v-chip size="small" color="success" variant="tonal">{{ item.status }}</v-chip>
+          </div>
+          <div class="text-caption text-medium-emphasis mb-2">
+            {{ new Date(item.created_at).toLocaleString() }}
+          </div>
+          <div class="d-flex justify-space-between text-body-2">
+            <span class="text-medium-emphasis">Customer</span>
+            <span>{{ item.customer?.name ?? 'Walk-in' }}</span>
+          </div>
+          <div class="d-flex justify-space-between text-body-2">
+            <span class="text-medium-emphasis">Payment</span>
+            <span>{{ item.payment_type?.name ?? '-' }}</span>
+          </div>
+          <v-divider class="my-2" />
+          <div class="d-flex justify-space-between align-center">
+            <span class="text-caption text-medium-emphasis">
+              Paid {{ formatAmount(item.paid_amount) }} · Change {{ formatAmount(item.change) }}
+            </span>
+            <span class="font-weight-bold">{{ formatAmount(item.total) }}</span>
+          </div>
+        </div>
+      </template>
     </AppDataTable>
   </AppCard>
 
@@ -245,29 +280,29 @@ watch(filters, load, { deep: true })
       <v-divider class="mb-4" />
 
       <div class="text-subtitle-2 mb-2">Items</div>
-      <v-table v-if="currentSale.items?.length" density="compact" class="border rounded mb-4">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th class="text-end">Qty</th>
-            <th class="text-end">Unit Price</th>
-            <th class="text-end">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(it, i) in currentSale.items" :key="i">
-            <td>
+      <div v-if="currentSale.items?.length" class="d-flex flex-column ga-2 mb-4">
+        <v-card
+          v-for="(it, i) in currentSale.items"
+          :key="i"
+          variant="outlined"
+          class="pa-2"
+        >
+          <div class="d-flex justify-space-between align-start">
+            <div class="flex-grow-1 text-break me-2 font-weight-medium">
               {{ it.product?.name ?? it.description ?? '-' }}
-              <div v-if="it.serials?.length" class="text-caption text-medium-emphasis">
-                SN: {{ it.serials.join(', ') }}
-              </div>
-            </td>
-            <td class="text-end">{{ it.quantity }}</td>
-            <td class="text-end">{{ formatAmount(it.unit_price) }}</td>
-            <td class="text-end font-weight-medium">{{ formatAmount(it.total) }}</td>
-          </tr>
-        </tbody>
-      </v-table>
+            </div>
+            <div class="font-weight-bold text-nowrap">
+              {{ formatAmount(it.total) }}
+            </div>
+          </div>
+          <div class="text-caption text-medium-emphasis mt-1">
+            {{ it.quantity }} × {{ formatAmount(it.unit_price) }}
+          </div>
+          <div v-if="it.serials?.length" class="text-caption text-medium-emphasis mt-1">
+            SN: {{ it.serials.join(', ') }}
+          </div>
+        </v-card>
+      </div>
 
       <v-divider class="mb-4" />
 
@@ -333,6 +368,22 @@ watch(filters, load, { deep: true })
         class="mb-4"
       />
 
+      <div class="text-subtitle-2 mb-2">Date Range</div>
+      <v-text-field
+        v-model="from"
+        label="From"
+        type="date"
+        clearable
+        class="mb-4"
+      />
+      <v-text-field
+        v-model="to"
+        label="To"
+        type="date"
+        clearable
+        class="mb-4"
+      />
+
       <v-btn
         block
         size="small"
@@ -354,3 +405,9 @@ watch(filters, load, { deep: true })
     </template>
   </v-snackbar>
 </template>
+
+<style scoped>
+.sale-card {
+  cursor: pointer;
+}
+</style>

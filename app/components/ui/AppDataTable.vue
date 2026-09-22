@@ -17,7 +17,7 @@ interface Props {
   height?: string | number
   itemValue?: string
   showSelect?: boolean
-  selectStrategy?: string
+  selectStrategy?: 'page' | 'all' | 'single'
   rowProps?: (item: any) => Record<string, any>
   sortBy?: { key: string; order: 'asc' | 'desc' }[]
   modelValue?: any[]
@@ -104,30 +104,54 @@ const displayHeaders = computed(() => props.headers.filter(h => h.key !== 'actio
       v-for="item in items"
       :key="item[itemValue]"
       class="mb-2 mobile-data-card"
-      flat
-      :border="true"
+      variant="outlined"
     >
       <slot name="mobile-item" :item="item">
-        <v-card-text class="pb-1">
+        <div class="mobile-data-header d-flex align-center justify-space-between pa-3">
+          <div class="flex-grow-1 min-w-0 me-2">
+            <div class="text-caption text-medium-emphasis mobile-data-header-label">
+              {{ displayHeaders[0]?.title }}
+            </div>
+            <div class="font-weight-bold text-primary text-break">
+              <slot v-if="displayHeaders[0] && $slots['item.' + displayHeaders[0].key]" :name="'item.' + displayHeaders[0].key" :item="item" />
+              <template v-else>{{ displayHeaders[0] ? item[displayHeaders[0].key] : '' }}</template>
+            </div>
+          </div>
+          <v-icon icon="mdi-chevron-right" color="primary" />
+        </div>
+
+        <v-divider />
+
+        <v-card-text class="pa-2 pb-1">
           <div
-            v-for="header in displayHeaders.slice(0, 5)"
+            v-for="header in displayHeaders.slice(1, 7)"
             :key="header.key"
             class="d-flex align-start gap-2 mb-1 mobile-data-row"
           >
-            <span class="font-weight-medium text-medium-emphasis" style="min-width: 80px;">
+            <span class="mobile-data-label" style="min-width: 100px;">
               {{ header.title }}:
             </span>
-            <span class="flex-grow-1 text-end text-break">
+            <span class="flex-grow-1 text-break mobile-data-value">
               <slot v-if="$slots['item.' + header.key]" :name="'item.' + header.key" :item="item" />
               <template v-else>{{ item[header.key] }}</template>
             </span>
           </div>
         </v-card-text>
-        <v-card-actions v-if="$slots['item.actions']" class="justify-end flex-wrap pt-0 pb-2">
+        <div v-if="$slots['item.actions']" class="mobile-data-actions d-flex justify-end align-center flex-wrap ga-2 px-3 py-2">
           <slot name="item.actions" :item="item" />
-        </v-card-actions>
+        </div>
       </slot>
     </v-card>
+
+    <v-pagination
+      v-if="itemsLength > itemsPerPage"
+      :model-value="page"
+      :length="Math.ceil(itemsLength / itemsPerPage)"
+      :total-visible="5"
+      density="compact"
+      class="mt-2"
+      @update:model-value="(p) => emit('update:page', p)"
+    />
   </div>
 </template>
 
@@ -140,7 +164,37 @@ const displayHeaders = computed(() => props.headers.filter(h => h.key !== 'actio
   margin-bottom: 8px;
 }
 
+.mobile-data-header {
+  background: rgba(var(--v-theme-primary), 0.08);
+}
+
+.mobile-data-header-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .mobile-data-row {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.mobile-data-label {
+  font-weight: 500;
+  color: rgba(var(--v-theme-on-surface), 0.7);
+}
+
+.mobile-data-value {
+  word-break: break-word;
+}
+
+.mobile-data-actions {
+  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
+  background: rgba(var(--v-theme-on-surface), 0.02);
+}
+
+.mobile-data-actions :deep(.v-btn--icon) {
+  min-width: 40px;
+  min-height: 40px;
 }
 </style>

@@ -198,8 +198,8 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
             clearable
             density="compact"
             variant="outlined"
-            style="max-width: 400px"
-            class="align-self-center me-3"
+            style="max-width: 400px; min-width: 0"
+            class="align-self-center me-3 flex-grow-1"
           />
           <v-select
             v-model="returnStatus"
@@ -211,7 +211,7 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
             density="compact"
             variant="outlined"
             style="max-width: 180px"
-            class="align-self-center me-4"
+            class="align-self-center me-4 d-none d-md-flex"
           />
           <v-badge
             :content="returnActiveFilterCount"
@@ -310,6 +310,35 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
               <span v-else class="text-medium-emphasis text-caption">-</span>
             </div>
           </template>
+
+          <template #mobile-item="{ item }">
+            <div class="pa-3 return-card" role="button" tabindex="0" @click="openPreview(item)" @keydown.enter="openPreview(item)">
+              <div class="d-flex align-center justify-space-between mb-1">
+                <span class="font-weight-bold text-primary">Return #{{ item.id }}</span>
+                <v-chip size="small" :color="statusColor[item.status] ?? 'default'" variant="tonal">{{ item.status }}</v-chip>
+              </div>
+              <div class="text-caption text-medium-emphasis mb-2">
+                {{ new Date(item.created_at).toLocaleString() }}
+              </div>
+              <div class="d-flex justify-space-between text-body-2">
+                <span class="text-medium-emphasis">Sale #</span>
+                <span>{{ item.sale?.sale_number ?? '-' }}</span>
+              </div>
+              <div class="d-flex justify-space-between text-body-2">
+                <span class="text-medium-emphasis">Customer</span>
+                <span>{{ item.sale?.customer?.name ?? 'Walk-in' }}</span>
+              </div>
+              <div class="d-flex justify-space-between text-body-2">
+                <span class="text-medium-emphasis">Requested By</span>
+                <span>{{ item.user?.name ?? '-' }}</span>
+              </div>
+              <v-divider class="my-2" />
+              <div class="d-flex justify-space-between align-center">
+                <span class="text-caption text-medium-emphasis">Total Refund</span>
+                <span class="font-weight-bold text-primary">{{ formatAmount(item.returned_total) }}</span>
+              </div>
+            </div>
+          </template>
         </AppDataTable>
       </AppCard>
 
@@ -357,8 +386,8 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
             clearable
             density="compact"
             variant="outlined"
-            style="max-width: 400px"
-            class="align-self-center me-3"
+            style="max-width: 400px; min-width: 0"
+            class="align-self-center me-3 flex-grow-1"
           />
           <v-spacer />
           <v-btn
@@ -402,6 +431,34 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
 
           <template #item.voided_at="{ item }">
             {{ item.voided_at ? new Date(item.voided_at).toLocaleString() : '-' }}
+          </template>
+
+          <template #mobile-item="{ item }">
+            <div class="pa-3">
+              <div class="d-flex align-center justify-space-between mb-1">
+                <span class="font-weight-bold text-primary">{{ item.sale_number }}</span>
+                <v-chip size="small" color="error" variant="tonal">voided</v-chip>
+              </div>
+              <div class="text-caption text-medium-emphasis mb-2">
+                {{ item.voided_at ? new Date(item.voided_at).toLocaleString() : '-' }}
+              </div>
+              <div class="d-flex justify-space-between text-body-2">
+                <span class="text-medium-emphasis">Customer</span>
+                <span>{{ item.customer?.name ?? 'Walk-in' }}</span>
+              </div>
+              <div class="d-flex justify-space-between text-body-2">
+                <span class="text-medium-emphasis">Voided By</span>
+                <span>{{ item.voidedBy?.name ?? '-' }}</span>
+              </div>
+              <div v-if="item.notes" class="text-caption text-medium-emphasis mt-1 text-break">
+                {{ item.notes.replace(/^Void reason: /, '') }}
+              </div>
+              <v-divider class="my-2" />
+              <div class="d-flex justify-space-between align-center">
+                <span class="text-caption text-medium-emphasis">Total</span>
+                <span class="font-weight-bold">{{ formatAmount(item.total) }}</span>
+              </div>
+            </div>
           </template>
         </AppDataTable>
       </AppCard>
@@ -513,3 +570,9 @@ watch(voidsError, (msg) => { if (msg) showError(msg) })
     </v-card-actions>
   </AppDialog>
 </template>
+
+<style scoped>
+.return-card {
+  cursor: pointer;
+}
+</style>

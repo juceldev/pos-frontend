@@ -139,7 +139,7 @@ function isSelected (roleId: number, permissionId: number): boolean {
       </v-tabs-window>
     </v-card-text>
 
-    <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" location="top">
+    <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="3000" location="bottom right">
       {{ snackbarText }}
       <template #actions>
         <v-btn variant="text" size="small" @click="snackbar = false">Close</v-btn>

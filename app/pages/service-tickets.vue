@@ -111,8 +111,15 @@ async function saveTicket () {
   }
 }
 
+const { confirm } = useConfirm()
+
 async function handleDelete (ticket: ServiceTicket) {
-  if (!confirm(`Delete service ticket ${ticket.ticket_number}?`)) return
+  const confirmed = await confirm({
+    title: 'Delete Service Ticket',
+    message: `Delete service ticket "${ticket.ticket_number}"?`,
+    confirmText: 'Delete'
+  })
+  if (!confirmed) return
   const ok = await deleteServiceTicket(ticket.id)
   if (ok) {
     await load()

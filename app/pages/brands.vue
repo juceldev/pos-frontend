@@ -94,8 +94,15 @@ async function saveBrand () {
   }
 }
 
+const { confirm } = useConfirm()
+
 async function handleDelete (brand: Brand) {
-  if (!confirm(`Delete brand ${brand.name}?`)) return
+  const confirmed = await confirm({
+    title: 'Delete Brand',
+    message: `Delete brand "${brand.name}"?`,
+    confirmText: 'Delete'
+  })
+  if (!confirmed) return
   const ok = await deleteBrand(brand.id)
   if (ok) {
     await load()

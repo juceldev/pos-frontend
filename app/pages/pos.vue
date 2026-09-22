@@ -509,7 +509,7 @@ async function completeSale () {
 }
 
 function printReceipt () {
-  window.print()
+  printElementById('receipt-print', 'Sale Receipt')
 }
 
 function newSale () {

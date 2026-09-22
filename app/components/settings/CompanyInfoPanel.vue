@@ -25,8 +25,8 @@ function verifyLicense () {
 <template>
   <div class="d-flex flex-wrap ga-4">
     <v-card flat class="pos-settings-card border" title="Company Information">
-      <v-card-text>
-        <v-row dense>
+      <v-card-text >
+        <v-row class="mt-3" dense>
           <v-col cols="12">
             <v-text-field v-model="form.company_name" label="Company / Store Name" variant="outlined" density="compact" hide-details :disabled="!canEdit" />
           </v-col>
@@ -51,7 +51,7 @@ function verifyLicense () {
 
     <v-card flat class="pos-settings-card border" title="Computer | Terminal Details">
       <v-card-text>
-        <v-row dense>
+        <v-row class="mt-3" dense>
           <v-col cols="12">
             <v-text-field v-model="form.pc_name" label="PC Name" variant="outlined" density="compact" hide-details :disabled="!canEdit" />
           </v-col>

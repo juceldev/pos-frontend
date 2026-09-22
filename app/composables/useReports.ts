@@ -28,6 +28,10 @@ export function useReports () {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  const pdfDialog = ref(false)
+  const pdfUrl = ref<string | null>(null)
+  const pdfTitle = ref('Report Preview')
+
   async function fetchDashboard () {
     try {
       return await $api('/api/reports/dashboard') as DashboardStats
@@ -85,14 +89,53 @@ export function useReports () {
     }
   }
 
+  function buildPdfUrl (path: string, params: Record<string, any> = {}): string {
+    return buildApiUrl(path, params)
+  }
+
+  function previewPdf (title: string, path: string, params: Record<string, any> = {}) {
+    if (!import.meta.client) return
+    pdfTitle.value = title
+    pdfUrl.value = buildPdfUrl(path, params)
+    pdfDialog.value = true
+  }
+
+  function openSalesReportPdf (from?: string, to?: string) {
+    previewPdf('Sales Report', '/api/reports/sales/pdf', { date_from: from, date_to: to })
+  }
+
+  function openStockInReportPdf (from?: string, to?: string) {
+    previewPdf('Stock-In Logs', '/api/reports/stock-in/pdf', { date_from: from, date_to: to })
+  }
+
+  function openStockOutReportPdf (from?: string, to?: string) {
+    previewPdf('Stock-Out Logs', '/api/reports/stock-out/pdf', { date_from: from, date_to: to })
+  }
+
+  function openSoldOutReportPdf () {
+    previewPdf('Sold-Out / Out-of-Stock', '/api/reports/sold-out/pdf')
+  }
+
+  function openExpensesReportPdf (from?: string, to?: string, type?: string | null) {
+    previewPdf('Expenses Report', '/api/reports/expenses/pdf', { date_from: from, date_to: to, type })
+  }
+
   return {
     loading,
     error,
+    pdfDialog,
+    pdfUrl,
+    pdfTitle,
     fetchDashboard,
     fetchAnalytics,
     fetchSalesReport,
     fetchStockInReport,
     fetchStockOutReport,
-    fetchSoldOutReport
+    fetchSoldOutReport,
+    openSalesReportPdf,
+    openStockInReportPdf,
+    openStockOutReportPdf,
+    openSoldOutReportPdf,
+    openExpensesReportPdf
   }
 }

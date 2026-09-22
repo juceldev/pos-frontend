@@ -22,13 +22,6 @@ const headers = [
   { title: 'Actions', key: 'actions', sortable: false, align: 'end' }
 ]
 
-const serialHeaders = [
-  { title: 'Serial Number', key: 'serial_number' },
-  { title: 'Status', key: 'status' },
-  { title: 'Added', key: 'created_at' },
-  { title: 'Actions', key: 'actions', align: 'end' }
-]
-
 const filters = computed(() => ({
   page: page.value,
   perPage: perPage.value,
@@ -63,8 +56,15 @@ async function handleStatusChange (serial: ProductSerial, status: string) {
   if (selectedProduct.value) await fetchSerials(selectedProduct.value.id)
 }
 
+const { confirm } = useConfirm()
+
 async function handleDeleteSerial (serial: ProductSerial) {
-  if (!confirm(`Delete serial ${serial.serial_number}?`)) return
+  const confirmed = await confirm({
+    title: 'Delete Serial',
+    message: `Delete serial "${serial.serial_number}"?`,
+    confirmText: 'Delete'
+  })
+  if (!confirmed) return
   await deleteSerial(serial.id)
   if (selectedProduct.value) await fetchSerials(selectedProduct.value.id)
 }
@@ -140,31 +140,39 @@ watch(filters, load, { deep: true })
           Add
         </v-btn>
       </div>
-      <v-data-table :headers="serialHeaders" :items="serials" density="compact" :items-per-page="10">
-        <template #item.status="{ item }">
-          <v-menu>
-            <template #activator="{ props }">
-              <v-chip v-bind="props" :color="statusColor(item.status)" style="cursor:pointer">
-                {{ item.status.replace('_', ' ') }}
-              </v-chip>
-            </template>
-            <v-list density="compact">
-              <v-list-item
-                v-for="s in ['in_stock', 'sold', 'defective', 'returned']"
-                :key="s"
-                :title="s.replace('_', ' ')"
-                @click="handleStatusChange(item, s)"
-              />
-            </v-list>
-          </v-menu>
-        </template>
-        <template #item.created_at="{ item }">
-          {{ item.created_at ? new Date(item.created_at).toLocaleDateString() : '-' }}
-        </template>
-        <template #item.actions="{ item }">
-          <v-btn icon="mdi-delete" variant="text" color="error" @click="handleDeleteSerial(item)" />
-        </template>
-      </v-data-table>
+      <div class="d-flex flex-column ga-2">
+        <v-card v-for="s in serials" :key="s.id" variant="outlined" class="pa-2">
+          <div class="d-flex align-center justify-space-between ga-2">
+            <div class="min-w-0 flex-1">
+              <div class="font-weight-medium text-break">{{ s.serial_number }}</div>
+              <div class="text-caption text-medium-emphasis">
+                {{ s.created_at ? new Date(s.created_at).toLocaleDateString() : '-' }}
+              </div>
+            </div>
+            <div class="d-flex align-center ga-1 flex-shrink-0">
+              <v-menu>
+                <template #activator="{ props }">
+                  <v-chip v-bind="props" size="small" :color="statusColor(s.status)" style="cursor:pointer">
+                    {{ s.status.replace('_', ' ') }}
+                  </v-chip>
+                </template>
+                <v-list density="compact">
+                  <v-list-item
+                    v-for="st in ['in_stock', 'sold', 'defective', 'returned']"
+                    :key="st"
+                    :title="st.replace('_', ' ')"
+                    @click="handleStatusChange(s, st)"
+                  />
+                </v-list>
+              </v-menu>
+              <v-btn icon="mdi-delete" variant="text" color="error" size="small" @click="handleDeleteSerial(s)" />
+            </div>
+          </div>
+        </v-card>
+        <div v-if="!serials?.length" class="text-center text-medium-emphasis text-caption py-4">
+          No serials yet
+        </div>
+      </div>
     </v-card-text>
     <v-card-actions class="border-t pa-3">
       <v-spacer />

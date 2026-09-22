@@ -2,6 +2,7 @@
   <v-app>
     <v-system-bar
       v-if="mdAndUp"
+      app
       color="primary"
       class="pos-system-bar px-2 px-md-4 d-none d-md-flex"
       height="32"
@@ -23,6 +24,7 @@
     <!-- Top app bar: logo, theme toggle, user menu -->
     <v-app-bar
       v-if="auth.ready && auth.isLoggedIn && !hideAppChrome && !isPosPage"
+      app
       flat
       color="surface"
       density="comfortable"
@@ -32,19 +34,16 @@
         <v-app-bar-nav-icon class="d-md-none" @click="mobileDrawer = !mobileDrawer" />
       </template>
 
-      <v-app-bar-title class="d-flex align-center text-primary font-weight-bold min-w-0" style="flex: 1 1 auto; min-width: 0;">
+      <v-app-bar-title class="d-flex align-center text-primary font-weight-bold min-w-0 text-caption text-sm-subtitle-2" style="flex: 1 1 auto; min-width: 0;">
         <v-img
           v-if="company?.company_logo_url"
           :src="company.company_logo_url"
-          max-height="40"
-          max-width="160"
+          max-height="32"
+          max-width="120"
           contain
           class="me-2"
         />
         <span v-else-if="company?.company_name" class="text-truncate me-2" style="min-width: 0; max-width: 100%;">{{ company.company_name }}</span>
-        <v-chip v-if="!company?.company_logo_url" color="primary" variant="outlined" size="x-small" class="ml-2 d-none d-sm-inline-flex">
-          v1.0.0
-        </v-chip>
       </v-app-bar-title>
 
       <v-spacer class="d-none d-md-flex" />
@@ -91,7 +90,8 @@
 
     <!-- Horizontal nav bar (desktop only) -->
     <v-app-bar
-    v-if="auth.ready && auth.isLoggedIn && !hideAppChrome && !isPosPage"
+      v-if="auth.ready && auth.isLoggedIn && !hideAppChrome && !isPosPage && mdAndUp"
+      app
       flat
       color="primary"
       density="compact"
@@ -154,13 +154,14 @@
     <v-navigation-drawer
       v-if="auth.ready && auth.isLoggedIn && !mdAndUp && !hideAppChrome && !isPosPage"
       v-model="mobileDrawer"
+      app
       temporary
       :width="260"
       color="background"
       class="mobile-nav-drawer"
     >
 
-      <v-list nav density="compact" class="pa-2">
+      <v-list nav density="compact" class="pa-2 mobile-nav-main">
         <template v-for="(entry, i) in filteredNav" :key="i">
           <!-- Flat link -->
           <v-list-item
@@ -170,7 +171,6 @@
             :title="entry.title"
             :active="route.path === entry.to"
             color="primary"
-            class="mb-1"
           />
 
           <!-- Expandable group -->
@@ -190,30 +190,28 @@
               :title="child.title"
               :active="route.path === child.to"
               color="primary"
-              class="pl-6 mb-1"
+              class="pl-6"
             />
           </v-list-group>
         </template>
       </v-list>
 
       <v-divider />
-      <v-list nav density="compact" class="pa-2">
+      <v-list nav density="compact" class="pa-2 mobile-nav-actions">
         <v-list-item
           v-if="auth.user"
           :title="auth.user?.name"
           :subtitle="auth.user?.role"
           prepend-icon="mdi-account"
           color="primary"
-          class="mb-1"
         />
         <v-list-item
           :prepend-icon="isDark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
           :title="isDark ? 'Light mode' : 'Dark mode'"
           color="primary"
-          class="mb-1"
           @click="toggle"
         />
-        <v-list-item prepend-icon="mdi-cog" title="Settings" color="primary" class="mb-1" @click="settingsDialog = true" />
+        <v-list-item prepend-icon="mdi-cog" title="Settings" color="primary" @click="settingsDialog = true" />
         <v-list-item prepend-icon="mdi-logout" title="Logout" color="error" @click="handleLogout" />
       </v-list>
     </v-navigation-drawer>
@@ -228,7 +226,7 @@
       <v-container
         v-else-if="auth.isLoggedIn"
         fluid
-        :class="['text-start', 'pt-2', { 'pa-0 ma-0 fill-height': hideAppChrome || isPosPage }]"
+        :class="['text-start', mdAndUp ? 'pt-4' : 'pt-1', { 'pa-0 ma-0 fill-height': hideAppChrome || isPosPage }]"
         :style="(hideAppChrome || isPosPage) ? { height: '100%' } : {}"
       >
         <slot />

@@ -27,7 +27,7 @@ defineEmits<{
     persistent
     scrollable
   >
-    <v-card-text class="py-4">
+    <v-card-text class="py-4 py-sm-4 px-3 px-sm-4">
       <slot />
     </v-card-text>
 

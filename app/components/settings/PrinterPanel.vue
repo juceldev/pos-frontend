@@ -20,7 +20,7 @@ const form = computed({
 })
 
 const titleOptions = [
-  'RECEIPT', 'SALES RECEIPT', 'JOB ORDER', 'CLAIM SLIP', 'DELIVERY RECEIPT',
+  'RECEIPT', 'SALES RECEIPT', 'WARRANTY RECEIPT', 'CLAIM SLIP', 'DELIVERY RECEIPT',
   'INVOICE', 'OFFICIAL RECEIPT'
 ]
 
@@ -33,7 +33,7 @@ const paperSizes = [
 
 <template>
   <v-row class="pos-printer-row">
-    <v-col cols="12" md="7" class="pos-printer-left">
+    <v-col cols="12" md="12" class="pos-printer-left">
       <!-- Receipt Title Header -->
       <v-card flat class="border mb-4" title="Receipt Title Header">
         <v-card-text>
@@ -64,9 +64,9 @@ const paperSizes = [
       <!-- Receipt Footer -->
       <v-card flat class="border mb-4" title="Receipt Footer">
         <v-card-text>
-          <v-textarea v-model="form.receipt_footer_remark" label="Footer Remark" rows="2" :disabled="!canEdit" variant="outlined" density="compact" hide-details />
-          <v-textarea v-model="form.receipt_vat_remark" label="RCT Remarks" rows="2" :disabled="!canEdit" variant="outlined" density="compact" hide-details class="mt-2" />
-          <v-textarea v-model="form.receipt_terms" label="Terms & Cond" rows="2" :disabled="!canEdit" variant="outlined" density="compact" hide-details class="mt-2" />
+          <v-textarea v-model="form.receipt_footer_remark" label="Footer Remark" rows="10" :disabled="!canEdit" variant="outlined" density="compact"  />
+          <v-textarea v-model="form.receipt_vat_remark" label="RCT Remarks" rows="10" :disabled="!canEdit" variant="outlined" density="compact"  class="mt-2" />
+          <v-textarea v-model="form.receipt_terms" label="Terms & Cond" rows="4" :disabled="!canEdit" variant="outlined" density="compact"  class="mt-2" />
         </v-card-text>
         <v-card-actions class="justify-end pa-4">
           <v-btn v-if="canEdit" color="primary" variant="elevated" class="px-8" @click="emit('save')">
@@ -76,7 +76,7 @@ const paperSizes = [
       </v-card>
     </v-col>
 
-    <v-col cols="12" md="5" class="pos-printer-right">
+    <v-col cols="12" md="12" class="pos-printer-right">
       <v-card flat class="border pos-preview-card" title="Receipt Preview">
         <div class="pos-preview-scroll">
           <ReceiptPreview :company="company" :printer="form" :sale="null" />

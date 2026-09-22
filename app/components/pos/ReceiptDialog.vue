@@ -52,14 +52,25 @@ function newSale () {
     <v-card-text class="d-flex justify-center pa-4">
       <ReceiptPreview :company="company" :printer="printer" :sale="sale" />
     </v-card-text>
+    <v-divider></v-divider>
     <v-card-actions>
-      <v-btn color="primary" prepend-icon="mdi-printer" @click="print">
-        Print
-      </v-btn>
       <v-spacer />
-      <v-btn variant="text" @click="newSale">
-        New Sale
+      <v-btn    
+        class="text-none"
+        color="indigo-darken-3"
+        text="New Sale"
+        variant="flat"
+         prepend-icon="mdi-printer" @click="print">
+        Print Receipt
       </v-btn>
+      <v-btn
+        class="text-none"
+        color="indigo-darken-3"
+        text="New Sale"
+        variant="flat"
+        prepend-icon="mdi-plus"
+        @click="newSale"
+      />
     </v-card-actions>
   </AppDialog>
 </template>

@@ -78,8 +78,15 @@ async function saveCategory (data: Partial<Category>) {
   }
 }
 
+const { confirm } = useConfirm()
+
 async function handleDelete (category: Category) {
-  if (!confirm(`Delete category ${category.name}?`)) return
+  const confirmed = await confirm({
+    title: 'Delete Category',
+    message: `Delete category "${category.name}"?`,
+    confirmText: 'Delete'
+  })
+  if (!confirmed) return
   const ok = await deleteCategory(category.id)
   if (ok) {
     await load()

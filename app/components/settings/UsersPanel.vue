@@ -121,8 +121,15 @@ async function saveUser () {
   }
 }
 
+const { confirm } = useConfirm()
+
 async function handleDelete (user: User) {
-  if (!confirm(`Delete user ${user.name}?`)) return
+  const confirmed = await confirm({
+    title: 'Delete User',
+    message: `Delete user "${user.name}"?`,
+    confirmText: 'Delete'
+  })
+  if (!confirmed) return
   const ok = await deleteUser(user.id)
   if (ok) {
     await load()
@@ -262,7 +269,7 @@ watch(filters, load, { deep: true })
       </v-row>
     </AppFormDialog>
 
-    <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000">
+    <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000" location="bottom right">
       {{ snackbarText }}
       <template #actions>
         <v-btn variant="text" @click="snackbar = false">Close</v-btn>

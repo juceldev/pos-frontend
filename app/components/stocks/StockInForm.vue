@@ -105,6 +105,8 @@ function openProductDialog () {
 function editItem (index: number) {
   const item = items.value[index]
   if (!item) return
+  priceSync = true
+  lastEditedPriceField = null
   editingItemIndex.value = index
   productSearch.value = ''
   entryProduct.value = item.product
@@ -113,6 +115,7 @@ function editItem (index: number) {
   entry.markup_percent = item.markup_percent
   entry.markup_amount = item.markup_amount
   entry.retail_price = item.retail_price
+  nextTick(() => { priceSync = false })
   entrySerials.value = [...item.serials]
   showManualSerials.value = false
   manualSerialsText.value = ''
@@ -152,12 +155,15 @@ function clearSelection () {
 
 function selectProduct (product: Product) {
   clearSelection()
+  priceSync = true
+  lastEditedPriceField = null
   entryProduct.value = product
   entry.quantity = 1
   entry.unit_cost = Number(product.cost_price) || 0
   entry.markup_percent = product.markup_percent != null ? Number(product.markup_percent) : null
   entry.markup_amount = product.markup_amount != null ? Number(product.markup_amount) : null
   entry.retail_price = product.regular_price != null ? Number(product.regular_price) : null
+  nextTick(() => { priceSync = false })
 }
 
 const verifyingSerial = ref(false)
@@ -247,29 +253,64 @@ async function searchProducts (query: string) {
 }
 
 
-// markup % → retail price auto-compute (and vice versa)
+// retail price ↔ markup sync — same rules as ProductForm:
+// an existing retail price wins; cost edits re-derive markup%,
+// markup% only computes the price when the price is empty or markup% is edited
+// last-edited field wins: markup stays fixed after blur (cost edits recompute
+// the price); a typed/loaded price stays fixed and re-derives markup instead
 let priceSync = false
-watch(() => [entry.unit_cost, entry.markup_percent], () => {
+let lastEditedPriceField: 'markup' | 'price' | null = null
+
+watch(() => entry.retail_price, () => {
   if (priceSync) return
-  if (entry.markup_percent != null) {
+  const cost = Number(entry.unit_cost) || 0
+  const price = Number(entry.retail_price) || 0
+  if (cost > 0 && price > 0) {
+    lastEditedPriceField = 'price'
     priceSync = true
-    const amount = entry.unit_cost * (entry.markup_percent / 100)
-    entry.markup_amount = Number(amount.toFixed(2))
-    entry.retail_price = Number((entry.unit_cost + amount).toFixed(2))
-    priceSync = false
+    entry.markup_amount = Number((price - cost).toFixed(2))
+    entry.markup_percent = Number((((price - cost) / cost) * 100).toFixed(2))
+    nextTick(() => { priceSync = false })
   }
 })
 
-watch(() => entry.retail_price, (price) => {
+watch(() => entry.unit_cost, () => {
   if (priceSync) return
-  if (price != null && entry.unit_cost > 0) {
+  const cost = Number(entry.unit_cost) || 0
+  const price = Number(entry.retail_price) || 0
+  const markupPercent = Number(entry.markup_percent) || 0
+  if (cost <= 0) return
+  if (markupPercent > 0 && (lastEditedPriceField === 'markup' || price <= 0)) {
     priceSync = true
-    const amount = price - entry.unit_cost
-    entry.markup_amount = Number(amount.toFixed(2))
-    entry.markup_percent = Number(((amount / entry.unit_cost) * 100).toFixed(2))
-    priceSync = false
+    entry.retail_price = Math.round(cost * (1 + markupPercent / 100))
+    entry.markup_amount = Number((entry.retail_price - cost).toFixed(2))
+    nextTick(() => { priceSync = false })
+  } else if (price > 0) {
+    priceSync = true
+    entry.markup_amount = Number((price - cost).toFixed(2))
+    entry.markup_percent = Number((((price - cost) / cost) * 100).toFixed(2))
+    nextTick(() => { priceSync = false })
   }
 })
+
+function onMarkupBlur () {
+  if (priceSync) return
+  const cost = Number(entry.unit_cost) || 0
+  const price = Number(entry.retail_price) || 0
+  const markupPercent = Number(entry.markup_percent) || 0
+  if (cost <= 0) return
+  if (markupPercent <= 0) {
+    entry.markup_amount = 0
+    return
+  }
+  const impliedMarkup = price > 0 ? Number((((price - cost) / cost) * 100).toFixed(2)) : null
+  if (impliedMarkup === markupPercent) return
+  lastEditedPriceField = 'markup'
+  priceSync = true
+  entry.retail_price = Math.round(cost * (1 + markupPercent / 100))
+  entry.markup_amount = Number((entry.retail_price - cost).toFixed(2))
+  nextTick(() => { priceSync = false })
+}
 
 function addItem (close = true) {
   const product = entryProduct.value
@@ -861,6 +902,7 @@ function submit () {
                       min="0"
                       variant="outlined"
                       density="compact"
+                      @blur="onMarkupBlur"
                     />
                   </v-col>
                   <v-col cols="6">

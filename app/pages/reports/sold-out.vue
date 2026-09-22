@@ -6,7 +6,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { loading, error, fetchSoldOutReport } = useReports()
+const { loading, error, pdfDialog, pdfUrl, pdfTitle, fetchSoldOutReport, openSoldOutReportPdf } = useReports()
 
 const page = ref(1)
 const perPage = ref(15)
@@ -17,6 +17,7 @@ const search = ref('')
 
 async function load () {
   const response = await fetchSoldOutReport({
+    search: search.value || undefined,
     page: page.value,
     per_page: perPage.value
   })
@@ -25,6 +26,15 @@ async function load () {
     meta.value = { total: response.meta.total }
   }
 }
+
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+watch(search, () => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    page.value = 1
+    load()
+  }, 400)
+})
 
 watch([page, perPage], load)
 onMounted(load)
@@ -35,32 +45,39 @@ onMounted(load)
     <AppPageHeader title="Sold-Out / Out-of-Stock" subtitle="Products with low or zero inventory" />
 
     <AppCard class="rounded-lg" elevation="1">
-      <v-toolbar color="surface" flat density="comfortable" class="rounded-t-lg">
-        <v-text-field
-          v-model="search"
-          label="Search products..."
-          prepend-inner-icon="mdi-magnify"
-          clearable
-          density="compact"
-          variant="outlined"
-          style="max-width: 320px"
-          class="align-self-center me-3"
-        />
-        <v-spacer />
-        <v-tooltip text="Refresh" location="top">
-          <template #activator="{ props: tipProps }">
-            <v-btn
-              v-bind="tipProps"
-              icon="mdi-refresh"
-              variant="text"
-              size="small"
-              aria-label="Refresh"
-              :loading="loading"
-              @click="load"
-            />
-          </template>
-        </v-tooltip>
-      </v-toolbar>
+      <v-row dense class="pa-3 align-center">
+        <v-col cols="12" sm="6" md="4">
+          <v-text-field
+            v-model="search"
+            label="Search products..."
+            prepend-inner-icon="mdi-magnify"
+            clearable
+            density="compact"
+            variant="outlined"
+            hide-details
+          />
+        </v-col>
+        <v-col cols="12" md class="d-flex justify-end gap-2">
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-file-pdf-box"
+            size="small"
+            @click="openSoldOutReportPdf()"
+          >
+            <span class="d-none d-sm-inline">Generate PDF</span>
+            <v-icon class="d-sm-none" />
+          </v-btn>
+          <v-btn
+            prepend-icon="mdi-refresh"
+            variant="text"
+            size="small"
+            :loading="loading"
+            @click="load"
+          >
+            Refresh
+          </v-btn>
+        </v-col>
+      </v-row>
       <v-divider />
 
       <AppDataTable
@@ -94,5 +111,7 @@ onMounted(load)
 
       <v-alert v-if="error" type="error" class="ma-4">{{ error }}</v-alert>
     </AppCard>
+
+    <PdfPreviewDialog v-model="pdfDialog" :url="pdfUrl" :title="pdfTitle" />
   </div>
 </template>

@@ -52,8 +52,7 @@ function printBarcode () {
 
 const typeItems = [
   { title: 'No Serial', value: 'no_serial' },
-  { title: 'With Serial', value: 'with_serial' },
-  { title: 'Package / Kit', value: 'package' }
+  { title: 'With Serial', value: 'with_serial' }
 ]
 
 const categoryItems = computed(() => categories.value ?? [])
@@ -112,6 +111,7 @@ watch(() => form.category_id, () => {
 })
 
 function resetForm () {
+  lastEditedPriceField = null
   form.product_sequence = ''
   form.barcode = ''
   form.special_code = ''
@@ -143,9 +143,15 @@ function resetForm () {
   form.package_items = []
 }
 
+let loadingProduct = false
+let lastEditedPriceField: 'markup' | 'price' | null = null
+
 function loadProduct (product: Product | null) {
+  loadingProduct = true
+  lastEditedPriceField = null
   if (!product) {
     resetForm()
+    nextTick(() => { loadingProduct = false })
     return
   }
   form.product_sequence = product.product_sequence
@@ -180,6 +186,7 @@ function loadProduct (product: Product | null) {
   form.package_items = (product.package_items ?? []).map(i => ({ product_id: i.product_id, quantity: i.quantity }))
   form.stock_quantity = Number(product.stock_quantity)
   form.is_active = product.is_active
+  nextTick(() => { loadingProduct = false })
 }
 
 watch(() => props.product, loadProduct, { immediate: true })
@@ -201,31 +208,73 @@ let updatingFromRegularPrice = false
 let updatingFromWholesalePrice = false
 let updatingFromPromoPrice = false
 
+// last-edited field wins: markup stays fixed after blur (cost edits recompute
+// the price); a typed/loaded price stays fixed and re-derives markup instead
 function calculatePrices () {
+  if (loadingProduct) return
   const cost = Number(form.cost_price) || 0
   const regular = Number(form.regular_price) || 0
   const markupPercent = Number(form.markup_percent) || 0
 
-  if (markupPercent > 0) {
-    form.markup_amount = Number((cost * (markupPercent / 100)).toFixed(2))
-    if (!regular && !isEdit.value) {
-      form.regular_price = Number((cost + form.markup_amount).toFixed(2))
-    }
-    if (!form.wholesale_price && !isEdit.value) {
-      form.wholesale_price = form.regular_price
-    }
-  } else if (cost > 0 && regular > 0) {
+  if (markupPercent > 0 && lastEditedPriceField === 'markup' && cost > 0) {
+    updatingFromRegularPrice = true
+    form.regular_price = Math.round(cost * (1 + markupPercent / 100))
+    form.markup_amount = Number((form.regular_price - cost).toFixed(2))
+    nextTick(() => { updatingFromRegularPrice = false })
+    return
+  }
+
+  if (cost > 0 && regular > 0) {
+    updatingFromRegularPrice = true
     form.markup_amount = Number((regular - cost).toFixed(2))
     form.markup_percent = Number((((regular - cost) / cost) * 100).toFixed(2))
+    nextTick(() => { updatingFromRegularPrice = false })
+    return
+  }
+
+  if (markupPercent > 0 && cost > 0 && !regular) {
+    updatingFromRegularPrice = true
+    form.regular_price = Math.round(cost * (1 + markupPercent / 100))
+    form.markup_amount = Number((form.regular_price - cost).toFixed(2))
+    nextTick(() => { updatingFromRegularPrice = false })
+  } else {
+    form.markup_amount = markupPercent > 0 ? Number((cost * (markupPercent / 100)).toFixed(2)) : 0
+  }
+
+  if (!form.wholesale_price) {
+    form.wholesale_price = form.regular_price
   }
 }
 
-watch(() => [form.cost_price, form.markup_percent], calculatePrices, { deep: true })
+watch(() => form.cost_price, calculatePrices, { deep: true })
 
-watch(() => [form.regular_price, form.cost_price], () => {
+// markup% applies on blur, not per keystroke — and only when it differs
+// from what the price implies, so tabbing through never overwrites a manual price
+function onMarkupBlur () {
+  if (loadingProduct) return
+  const cost = Number(form.cost_price) || 0
+  const price = Number(form.regular_price) || 0
+  const markupPercent = Number(form.markup_percent) || 0
+  if (cost <= 0) return
+  if (markupPercent <= 0) {
+    form.markup_amount = 0
+    return
+  }
+  const impliedMarkup = price > 0 ? Number((((price - cost) / cost) * 100).toFixed(2)) : null
+  if (impliedMarkup === markupPercent) return
+  lastEditedPriceField = 'markup'
+  updatingFromRegularPrice = true
+  form.regular_price = Math.round(cost * (1 + markupPercent / 100))
+  form.markup_amount = Number((form.regular_price - cost).toFixed(2))
+  nextTick(() => { updatingFromRegularPrice = false })
+}
+
+watch(() => form.regular_price, () => {
+  if (loadingProduct || updatingFromRegularPrice) return
   const cost = Number(form.cost_price) || 0
   const price = Number(form.regular_price) || 0
   if (cost > 0 && price > 0) {
+    lastEditedPriceField = 'price'
     updatingFromRegularPrice = true
     form.markup_percent = Number((((price - cost) / cost) * 100).toFixed(2))
     form.markup_amount = Number((price - cost).toFixed(2))
@@ -233,17 +282,8 @@ watch(() => [form.regular_price, form.cost_price], () => {
   }
 }, { deep: true })
 
-watch(() => [form.markup_percent, form.cost_price], () => {
-  if (updatingFromRegularPrice) return
-  const cost = Number(form.cost_price) || 0
-  const markupPercent = Number(form.markup_percent) || 0
-  if (cost > 0 && markupPercent > 0) {
-    form.markup_amount = Number((cost * (markupPercent / 100)).toFixed(2))
-    form.regular_price = Number((cost + form.markup_amount).toFixed(2))
-  }
-}, { deep: true })
-
 watch(() => [form.wholesale_price, form.cost_price], () => {
+  if (loadingProduct) return
   const cost = Number(form.cost_price) || 0
   const price = Number(form.wholesale_price) || 0
   if (cost > 0 && price > 0) {
@@ -255,16 +295,17 @@ watch(() => [form.wholesale_price, form.cost_price], () => {
 }, { deep: true })
 
 watch(() => [form.wholesale_markup_percent, form.cost_price], () => {
-  if (updatingFromWholesalePrice) return
+  if (updatingFromWholesalePrice || loadingProduct) return
   const cost = Number(form.cost_price) || 0
   const markupPercent = Number(form.wholesale_markup_percent) || 0
   if (cost > 0 && markupPercent > 0) {
-    form.wholesale_markup_amount = Number((cost * (markupPercent / 100)).toFixed(2))
-    form.wholesale_price = Number((cost + form.wholesale_markup_amount).toFixed(2))
+    form.wholesale_price = Math.round(cost * (1 + markupPercent / 100))
+    form.wholesale_markup_amount = Number((form.wholesale_price - cost).toFixed(2))
   }
 }, { deep: true })
 
 watch(() => [form.promo_price, form.cost_price], () => {
+  if (loadingProduct) return
   const cost = Number(form.cost_price) || 0
   const price = Number(form.promo_price) || 0
   if (cost > 0 && price > 0) {
@@ -275,11 +316,11 @@ watch(() => [form.promo_price, form.cost_price], () => {
 }, { deep: true })
 
 watch(() => [form.promo_markup_percent, form.cost_price], () => {
-  if (updatingFromPromoPrice) return
+  if (updatingFromPromoPrice || loadingProduct) return
   const cost = Number(form.cost_price) || 0
   const markupPercent = Number(form.promo_markup_percent) || 0
   if (cost > 0 && markupPercent > 0) {
-    form.promo_price = Number((cost * (1 + markupPercent / 100)).toFixed(2))
+    form.promo_price = Math.round(cost * (1 + markupPercent / 100))
   }
 }, { deep: true })
 
@@ -711,16 +752,12 @@ watch(
                             v-model="form.warranty_period"
                             label="Warranty Period"
                             :items="[
-                              'No Warranty',
                               '7 Days',
-                              '15 Days',
                               '1 Month',
                               '3 Months',
                               '6 Months',
                               '1 Year',
-                              '2 Years',
-                              '3 Years',
-                              'Lifetime'
+                              '2 Years'
                             ]"
                             variant="outlined"
                             density="compact"
@@ -770,6 +807,7 @@ watch(
                                     variant="outlined"
                                     density="compact"
                                     hide-details="auto"
+                                    @blur="onMarkupBlur"
                                   />
                                 </v-col>
                                 <v-col cols="12" md="6">
@@ -789,12 +827,12 @@ watch(
                         </v-col>
                         <!-- Wholesale -->
                         <v-col cols="12" md="3">
-                          <div class="pricing-box pricing-wholesale">
-                            <div class="pricing-header pricing-wholesale-header">
+                          <!-- <div class="pricing-box pricing-wholesale"> -->
+                            <!-- <div class="pricing-header pricing-wholesale-header">
                               [ F9 ] Wholesale
-                            </div>
-                            <div class="pricing-body pricing-wholesale-body">
-                              <v-row dense>
+                            </div> -->
+                            <!-- <div class="pricing-body pricing-wholesale-body"> -->
+                              <!-- <v-row dense>
                                 <v-col cols="12" md="6">
                                   <v-text-field
                                     v-model.number="form.wholesale_markup_percent"
@@ -817,13 +855,13 @@ watch(
                                     hide-details="auto"
                                   />
                                 </v-col>
-                              </v-row>
-                            </div>
-                          </div>
+                              </v-row> -->
+                            <!-- </div> -->
+                          <!-- </div> -->
                         </v-col>
                         <!-- Promo -->
                         <v-col cols="12" md="3">
-                          <div class="pricing-box pricing-promo">
+                          <!-- <div class="pricing-box pricing-promo">
                             <div class="pricing-header pricing-promo-header">
                               [ + ] Promo
                             </div>
@@ -853,7 +891,7 @@ watch(
                                 </v-col>
                               </v-row>
                             </div>
-                          </div>
+                          </div> -->
                         </v-col>
                       </v-row>
                       <v-row dense class="mt-3">
@@ -982,10 +1020,10 @@ watch(
             Back to Scan
           </v-btn>
           <v-spacer />
-          <v-btn v-if="isEdit" color="indigo" variant="elevated" prepend-icon="mdi-barcode" :disabled="!form.barcode" @click="printBarcode">
+          <v-btn v-if="isEdit" color="indigo" variant="elevated" prepend-icon="mdi-barcode" :disabled="!form.barcode" class="d-none d-md-inline-flex" @click="printBarcode">
             Print Barcode
           </v-btn>
-          <v-btn v-if="isEdit" color="teal" variant="elevated" prepend-icon="mdi-magnify" @click="openSerials">
+          <v-btn v-if="isEdit" color="teal" variant="elevated" prepend-icon="mdi-magnify" class="d-none d-md-inline-flex" @click="openSerials">
             View Serials
           </v-btn>
           <v-btn

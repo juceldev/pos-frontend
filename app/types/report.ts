@@ -46,6 +46,11 @@ export interface SalesTrendPoint {
   count: number
 }
 
+export interface ExpenseTrendPoint {
+  date: string
+  total: number
+}
+
 export interface TopProductPoint {
   name: string
   quantity: number
@@ -83,6 +88,7 @@ export interface AnalyticsData {
   range: AnalyticsRange
   summary: AnalyticsSummary
   sales_trend: SalesTrendPoint[]
+  expenses_trend: ExpenseTrendPoint[]
   top_products: TopProductPoint[]
   payment_breakdown: PaymentBreakdownPoint[]
   category_sales: CategorySalesPoint[]

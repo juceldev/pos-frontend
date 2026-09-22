@@ -126,8 +126,15 @@ async function saveReceive () {
   }
 }
 
+const { confirm } = useConfirm()
+
 async function handleDelete (po: PurchaseOrder) {
-  if (!confirm(`Delete ${po.po_number}?`)) return
+  const confirmed = await confirm({
+    title: 'Delete Purchase Order',
+    message: `Delete ${po.po_number}?`,
+    confirmText: 'Delete'
+  })
+  if (!confirmed) return
   const ok = await deletePurchaseOrder(po.id)
   if (ok) await load()
 }

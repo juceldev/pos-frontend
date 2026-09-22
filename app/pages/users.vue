@@ -125,8 +125,15 @@ async function saveUser () {
   }
 }
 
+const { confirm } = useConfirm()
+
 async function handleDelete (user: User) {
-  if (!confirm(`Delete user ${user.name}?`)) return
+  const confirmed = await confirm({
+    title: 'Delete User',
+    message: `Delete user "${user.name}"?`,
+    confirmText: 'Delete'
+  })
+  if (!confirmed) return
   const ok = await deleteUser(user.id)
   if (ok) {
     await load()

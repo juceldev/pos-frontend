@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Expense } from '~/types/expense'
 import { useExpenses } from '~/composables/useExpenses'
+import { useReports } from '~/composables/useReports'
 import { usePermission } from '~/composables/usePermission'
 import { formatAmount, formatDate } from '~/utils/format'
 
@@ -9,6 +10,7 @@ definePageMeta({
 })
 
 const { expenses, meta, loading, error, fetchExpenses, createExpense, updateExpense, deleteExpense, fetchExpenseTypes, createExpenseType } = useExpenses()
+const { pdfDialog, pdfUrl, pdfTitle, openExpensesReportPdf } = useReports()
 const { hasPermission } = usePermission()
 
 const search = ref('')
@@ -81,7 +83,7 @@ const activeFilterCount = computed(() =>
 const activeFilters = computed(() => {
   const list: { key: string, label: string, clear: () => void }[] = []
   if (type.value) {
-    const item = expenseTypes.find(i => i.value === type.value)
+    const item = expenseTypes.value.find(i => i.value === type.value)
     list.push({ key: 'type', label: `Type: ${item?.title ?? type.value}`, clear: () => { type.value = null } })
   }
   if (from.value) list.push({ key: 'from', label: `From: ${from.value}`, clear: () => { from.value = '' } })
@@ -266,15 +268,27 @@ watch(filters, load, { deep: true })
         </v-tooltip>
       </v-badge>
       <v-spacer />
-      <v-btn
-        prepend-icon="mdi-refresh"
-        variant="text"
-        size="small"
-        :loading="loading"
-        @click="load"
-      >
-        <span class="d-none d-sm-inline">Refresh</span>
-      </v-btn>
+      <div class="d-flex align-center gap-2">
+       
+        <v-btn
+            color="primary"
+            prepend-icon="mdi-file-pdf-box"
+            size="small"
+          @click="openExpensesReportPdf(from, to, type)"
+          >
+            <span class="d-none d-sm-inline">Generate PDF</span>
+            <v-icon class="d-sm-none" />
+          </v-btn>
+        <v-btn
+          prepend-icon="mdi-refresh"
+          variant="text"
+          size="small"
+          :loading="loading"
+          @click="load"
+        >
+          Refresh
+        </v-btn>
+      </div>
     </v-toolbar>
     <div v-if="activeFilters.length" class="d-flex flex-wrap ga-1 px-4 pb-2">
       <v-chip
@@ -464,6 +478,8 @@ watch(filters, load, { deep: true })
       </v-col>
     </v-row>
   </AppFormDialog>
+
+  <PdfPreviewDialog v-model="pdfDialog" :url="pdfUrl" :title="pdfTitle" />
 
   <v-snackbar v-model="snackbar" :color="snackbarColor" timeout="4000">
     {{ snackbarText }}
