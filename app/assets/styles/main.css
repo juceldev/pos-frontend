@@ -286,11 +286,17 @@ html {
   }
 
   #receipt-print,
-  #receipt-print * {
+  #receipt-print *,
+  #dummy-receipt-print,
+  #dummy-receipt-print *,
+  #quotation-receipt-print,
+  #quotation-receipt-print * {
     visibility: visible;
   }
 
-  #receipt-print {
+  #receipt-print,
+  #dummy-receipt-print,
+  #quotation-receipt-print {
     position: absolute;
     left: 0;
     top: 0;
@@ -303,12 +309,16 @@ html {
     overflow: visible !important;
   }
 
-  #receipt-print .receipt-thermal {
+  #receipt-print .receipt-thermal,
+  #dummy-receipt-print .receipt-thermal,
+  #quotation-receipt-print .receipt-thermal {
     width: 80mm;
     box-shadow: none !important;
   }
 
-  #receipt-print .receipt-bond {
+  #receipt-print .receipt-bond,
+  #dummy-receipt-print .receipt-bond,
+  #quotation-receipt-print .receipt-bond {
     width: 100%;
     max-width: 100% !important;
     min-height: 0 !important;
@@ -316,7 +326,9 @@ html {
     border: none !important;
   }
 
-  #receipt-print .v-card-text {
+  #receipt-print .v-card-text,
+  #dummy-receipt-print .v-card-text,
+  #quotation-receipt-print .v-card-text {
     padding: 0 !important;
     overflow: visible !important;
     max-height: none !important;
@@ -324,11 +336,19 @@ html {
 
   #receipt-print .v-card-title,
   #receipt-print .v-card-actions,
-  #receipt-print .receipt-actions {
+  #receipt-print .receipt-actions,
+  #dummy-receipt-print .v-card-title,
+  #dummy-receipt-print .v-card-actions,
+  #dummy-receipt-print .receipt-actions,
+  #quotation-receipt-print .v-card-title,
+  #quotation-receipt-print .v-card-actions,
+  #quotation-receipt-print .receipt-actions {
     display: none !important;
   }
 
-  #receipt-print .v-divider {
+  #receipt-print .v-divider,
+  #dummy-receipt-print .v-divider,
+  #quotation-receipt-print .v-divider {
     margin: 4px 0 !important;
   }
 }

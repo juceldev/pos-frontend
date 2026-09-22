@@ -12,16 +12,29 @@ export function printElementById (elementId: string, title = 'Receipt'): void {
     .map(node => node.outerHTML)
     .join('\n')
 
-  const win = window.open('', '_blank', 'width=900,height=700')
-  if (!win) {
+  const iframe = document.createElement('iframe')
+  iframe.style.position = 'fixed'
+  iframe.style.right = '0'
+  iframe.style.bottom = '0'
+  iframe.style.width = '0'
+  iframe.style.height = '0'
+  iframe.style.border = '0'
+  iframe.setAttribute('aria-hidden', 'true')
+  document.body.appendChild(iframe)
+
+  const win = iframe.contentWindow
+  const doc = win?.document
+  if (!win || !doc) {
+    iframe.remove()
     window.print()
     return
   }
 
-  win.document.open()
-  win.document.write(`<!doctype html>
+  doc.open()
+  doc.write(`<!doctype html>
 <html>
 <head>
+  <base href="${document.baseURI}">
   <title>${title}</title>
   ${head}
   <style>
@@ -34,10 +47,23 @@ export function printElementById (elementId: string, title = 'Receipt'): void {
 </head>
 <body>${clone.outerHTML}</body>
 </html>`)
-  win.document.close()
-  win.onload = () => {
+  doc.close()
+
+  const cleanup = () => iframe.remove()
+  win.addEventListener('afterprint', cleanup)
+  setTimeout(cleanup, 60000)
+
+  let printed = false
+  const doPrint = () => {
+    if (printed) return
+    printed = true
     win.focus()
     win.print()
-    win.close()
+  }
+  win.addEventListener('load', doPrint)
+  if (doc.readyState === 'complete') {
+    setTimeout(doPrint, 250)
+  } else {
+    setTimeout(doPrint, 3000)
   }
 }

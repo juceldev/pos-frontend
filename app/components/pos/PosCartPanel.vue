@@ -3,6 +3,8 @@ import type { CartItem } from '~/types/cart'
 import type { Customer } from '~/types/product'
 import type { PaymentType } from '~/types/settings'
 import { formatAmount, formatNumber } from '~/utils/format'
+import { useSettings } from '~/composables/useSettings'
+import { printElementById } from '~/utils/print'
 
 interface Props {
   orderNumber: string
@@ -50,6 +52,26 @@ function paymentIcon (name: string): string {
 
 function selectPaymentType (id: number) {
   emit('update:paymentTypeId', id)
+}
+
+const { company, printer, fetchSettings } = useSettings()
+const showDummyReceipt = ref(false)
+
+onMounted(fetchSettings)
+
+const dummyDialogWidth = computed(() => {
+  const size = (printer.value?.sales_paper_size ?? '').toLowerCase()
+  return size.includes('bond') || size.includes('5.5') || size.includes('8.5 x 11') || size.includes('8.5 x 13') ? '900' : '400'
+})
+
+function printDummyReceipt () {
+  printElementById('dummy-receipt-print', 'Dummy Receipt')
+}
+
+const showQuotation = ref(false)
+
+function printQuotation () {
+  printElementById('quotation-receipt-print', 'Quotation')
 }
 
 
@@ -242,6 +264,28 @@ watch(dialogSerials, (serials) => {
             <span class="pos-payment-method-name">{{ pt.name }}</span>
           </v-card>
         </v-col>
+        <v-col cols="4">
+          <v-card
+            flat
+            class="pos-payment-method-card d-flex flex-column align-center justify-center text-center"
+            color="grey-lighten-4"
+            @click="showDummyReceipt = true"
+          >
+            <v-icon size="16" class="pos-payment-method-icon">mdi-printer</v-icon>
+            <span class="pos-payment-method-name">Dummy Receipt</span>
+          </v-card>
+        </v-col>
+        <v-col cols="4">
+          <v-card
+            flat
+            class="pos-payment-method-card d-flex flex-column align-center justify-center text-center"
+            color="grey-lighten-4"
+            @click="showQuotation = true"
+          >
+            <v-icon size="16" class="pos-payment-method-icon">mdi-file-document-outline</v-icon>
+            <span class="pos-payment-method-name">Quotation</span>
+          </v-card>
+        </v-col>
       </v-row>
     </div>
 
@@ -255,6 +299,69 @@ watch(dialogSerials, (serials) => {
     >
       Proceed to payment
     </v-btn>
+
+    <AppDialog
+      v-model="showDummyReceipt"
+      id="dummy-receipt-print"
+      title="Warranty Receipt"
+      icon="mdi-printer"
+      :max-width="dummyDialogWidth"
+      scrollable
+    >
+      <v-card-text class="d-flex justify-center pa-4">
+        <DummyReceiptPreview :company="company" :printer="printer" :cart="cart" :order-number="orderNumber" />
+      </v-card-text>
+      <v-divider />
+      <v-card-actions>
+        <v-spacer />
+        <v-btn
+          class="text-none"
+          color="indigo-darken-3"
+          variant="flat"
+          prepend-icon="mdi-printer"
+          @click="printDummyReceipt"
+        >
+          Print
+        </v-btn>
+        <v-btn variant="text" @click="showDummyReceipt = false">Close</v-btn>
+      </v-card-actions>
+    </AppDialog>
+
+    <AppDialog
+      v-model="showQuotation"
+      id="quotation-receipt-print"
+      title="Quotation"
+      icon="mdi-file-document-outline"
+      :max-width="dummyDialogWidth"
+      scrollable
+    >
+      <v-card-text class="d-flex justify-center pa-4">
+        <QuotationReceiptPreview
+          :company="company"
+          :printer="printer"
+          :cart="cart"
+          :customer-name="selectedCustomerName"
+          :subtotal="subtotal"
+          :vat="vat"
+          :discount="discount"
+          :total="total"
+        />
+      </v-card-text>
+      <v-divider />
+      <v-card-actions>
+        <v-spacer />
+        <v-btn
+          class="text-none"
+          color="indigo-darken-3"
+          variant="flat"
+          prepend-icon="mdi-printer"
+          @click="printQuotation"
+        >
+          Print
+        </v-btn>
+        <v-btn variant="text" @click="showQuotation = false">Close</v-btn>
+      </v-card-actions>
+    </AppDialog>
 
     <AppDialog
       v-if="serialDialogItem"
